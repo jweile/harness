@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/DECORATION/1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.0 http://maven.apache.org/xsd/decoration-1.0.0.xsd">
+
+  <skin>
+      <groupId>uk.ac.ncl.cs</groupId>
+      <artifactId>ncl-skin</artifactId>
+      <version>1.0-SNAPSHOT</version>
+  </skin>
+
+  <bannerLeft>
+    <src>/images/nu_logo.png</src>
+  </bannerLeft>
+  <bannerRight>
+    <name>${project.name}</name>
+  </bannerRight>
+
+  <publishDate position="right"/>
+  <version position="right"/>
+
+<!--  <poweredBy>
+      <logo name="BBSRC" href="http://www.bbsrc.ac.uk" img="http://www.bbsrc.ac.uk/web/MultimediaFiles/NOSTRAP_BBSRC_COLOUR_THUMB.GIF"/>
+  </poweredBy>-->
+
+  <body>
+
+    <breadcrumbs>
+        <item name="Newcastle University" href="http://www.ncl.ac.uk"/>
+        <item name="Computing Science" href="http://www.cs.ncl.ac.uk"/>
+        <item name="Integrative Bioinformatics" href="http://bioinf.ncl.ac.uk/research/"/>
+        <item name="${project.name}" href="index.html"/>
+    </breadcrumbs>
+
+    <menu name="Documentation">
+      <item name="Introduction" href="index.html"/>
+      <item name="Usage" href="usage.html" collapse="true">
+        <item name="Protocol format" href="protocol.html"/>
+        <item name="Writing extensions" href="extensions.html"/>
+      </item>
+      <item name="Implementation" href="implementation.html"/>
+      <item name="Javadoc" href="apidocs/index.html"/>
+    </menu>
+
+    <menu name="Downloads">
+        <item name="Downloads" href="download.html"/>
+    </menu>
+
+    <menu name="Information for developers">
+        <item name="Project summary" href="project-summary.html"/>
+        <item name="Dependencies" href="dependencies.html"/>
+        <item name="Source repository" href="source-repository.html"/>
+        <item name="Test reports" href="tests.html" collapse="true">
+            <item name="Unit tests" href="surefire-report.html"/>
+            <item name="Unit test coverage" href="cobertura/index.html"/>
+            <item name="Integration tests" href="failsafe-report.html"/>
+        </item>
+        <item name="Issues" href="issues.html" collapse="true">
+            <item name="Code tags" href="taglist.html"/>
+        </item>
+    </menu>
+
+    <menu name="Credits">
+        <item name="License" href="license.html"/>
+        <item name="Team" href="team-list.html"/>
+    </menu>
+    
+  </body>
+
+</project>

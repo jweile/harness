@@ -1,0 +1,38 @@
+
+Usage
+~~~~~
+
+* Requirements
+
+  You will need an installation of Java 6. Go to oracle.com or openjdk.java.net to obtain the latest version. Ubuntu users can simply install it from the software manager. To confirm that you have the correct version of java installed, open a command line interface and enter
+
++------------+
+java -version
++------------+
+
+* Installation
+
+  To install harness go to the {{{./download.html}download page}} and click the link to the latest stable jar.
+
+* Execution
+
+  To execute harness open a command line interface and change directory to the location to which you downloaded the harness.jar.
+  Execute
+
++---------------------------------------------+
+java -jar harness.jar -t <tag> <protocol-file>
++---------------------------------------------+
+
+  where <protocol-file> is the path to a workflow protocol XML file you wish to run, and <tag> is a custom tag. The tag will be used on the output directory created during the harness execution.
+
+** Options
+
+  Other options include the <<<-c>>> option, which can be used to specify the number of CPU cores you wish harness to use. This is particularly useful when running large jobs on powerful servers. By default, harness will only use one CPU core.
+
+* Protocol files
+
+  Protocol files are XML files that follow the syntax defined by the {{./protocol.xsd}} schema definition.
+
+[./images/protocol_xsd.png] XSD Schema
+
+* Extensions

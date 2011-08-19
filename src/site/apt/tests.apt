@@ -1,0 +1,13 @@
+Test reports
+
+* {{{surefire-report.html}Unit tests}}
+
+  Shows the results of Unit tests peformed on the code.
+
+* {{{cobertura/index.html}Unit test coverage}}
+
+  Shows a report on how much of the code is currently covered by Unit tests.
+
+* {{{failsafe-report.html}Integration tests}}
+
+  Shows the results of Integration testing.

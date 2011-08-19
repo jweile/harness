@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xh:protocol  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+   xmlns:xh='http://cs.ncl.ac.uk/harness/protocol'
+   xsi:schemaLocation='http://cs.ncl.ac.uk/harness/protocol harness.xsd'>
+    <xh:variables>
+<!--        <xh:incrementalVariable id="sensEv" min="0.9" max="0.99" inc="0.03"/>
+        <xh:incrementalVariable id="sensGS" min="0.9" max="0.99" inc="0.03"/>-->
+<!--        <xh:incrementalVariable id="replEv" min="2" max="5" inc="1"/>-->
+<!--        <xh:incrementalVariable id="replGS" min="2" max="3" inc="1"/>-->
+<!--        <xh:logarithmicVariable id="specEv" range="0-1" iterations="4"/>-->
+<!--        <xh:logarithmicVariable id="specGS" range="0-1" iterations="4"/>-->
+<!--        <xh:incrementalVariable id="leeThreshold" min="5.0" max="15" inc="0.5"/>-->
+<!--        <xh:incrementalVariable id="dval" min="1.0" max="5.0" inc="0.1"/>-->
+        <xh:incrementalVariable id="fprEv" min="0.1" max="0.9" inc="0.1"/>
+    </xh:variables>
+    <xh:graphImplementation type="mapgraph"/>
+    <xh:graphPopulation type="scalefree">
+        <xh:properties>
+            <xh:staticProperty key="seed" type="xsd:int" value="3"/>
+            <xh:staticProperty key="numNodes" type="xsd:int" value="500"/>
+        </xh:properties>
+    </xh:graphPopulation>
+    <xh:integration type="lycett2" cycleReplicas="10">
+        <xh:goldStandards>
+            <xh:experiment type="fastexperiment">
+<!--                <xh:variableReplicas var-ref="replGS"/>-->
+                <xh:staticReplicas value="1"/>
+<!--                    <xh:staticReplicas value="1"/>-->
+                <xh:properties>
+<!--                    <xh:variableProperty key="sensitivity" type="xsd:double" var-ref="sensGS"/>-->
+                    <xh:staticProperty key="sensitivity" type="xsd:double" value="0.9"/>
+<!--                    <xh:variableProperty key="specificity" type="xsd:double" var-ref="specGS"/>-->
+                    <xh:staticProperty key="fpr" type="xsd:double" value="0.05"/>
+                </xh:properties>
+            </xh:experiment>
+        </xh:goldStandards>
+        <xh:evidentialGraphs>
+            <xh:experiment type="fastexperiment">
+<!--                <xh:variableReplicas var-ref="replEv"/>-->
+                <xh:staticReplicas value="4"/>
+                <xh:properties>
+<!--                    <xh:variableProperty key="sensitivity" type="xsd:double" var-ref="sensEv"/>-->
+                    <xh:staticProperty key="sensitivity" type="xsd:double" value="0.9"/>
+                    <xh:variableProperty key="fpr" type="xsd:double" var-ref="fprEv"/>
+<!--                    <xh:staticProperty key="specificity" type="xsd:double" value="0.999"/>-->
+                </xh:properties>
+            </xh:experiment>
+        </xh:evidentialGraphs>
+        <xh:properties>
+<!--            <xh:staticProperty key="dValue" type="xsd:double" value="1.1"/>-->
+<!--            <xh:staticProperty key="threshold" type="xsd:double" value="9.5"/>-->
+<!--            <xh:variableProperty key="dValue" type="xsd:double" var-ref="dval"/>-->
+        </xh:properties>
+    </xh:integration>
+
+</xh:protocol>

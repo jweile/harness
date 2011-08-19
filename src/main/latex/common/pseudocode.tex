@@ -1,0 +1,91 @@
+%%%%%%%%%%
+% MACROS %
+%%%%%%%%%%
+
+%Automatically count line numbers and adjust indentation
+\newcounter{indentDepth}
+\newcounter{indentI}
+\newcommand{\pcIndent}{\forloop{indentI}{0}{\value{indentI} < \value{indentDepth}}{\ \ }}
+\newcommand{\pcIncIndent}{\stepcounter{indentDepth}}
+\newcommand{\pcDecIndent}{\addtocounter{indentDepth}{-1}}
+\newcounter{pcLine}
+\newcommand{\pc}{\stepcounter{pcLine} \arabic{pcLine}\ \pcIndent}
+
+%Whitespace for within formulas
+\newcommand{\tab}{\text{\ }}
+
+%%%%%%%%%%%%
+% CONTENTS %
+%%%%%%%%%%%%
+{\tt %set font to monospace
+
+Input: $X = (X_1, \ldots , X_n)$, $\odds(L)$, $t_\text{max}$\\
+\rule{\textwidth}{0.02cm}\\
+\pc main$(X, \odds(L), t_\text{max})$ \{\\
+\pcIncIndent
+\pc $\forall \; 1 \leq i \leq n \tab\tab \alpha_i \sim Be(1,1) \tab ;\tab \beta_i \sim Be(1,1)$\\
+\pc $\theta_0 \leftarrow \{(\alpha_1 , \beta_1), \ldots , (\alpha_n , \beta_n) \}$\\
+\pc $G_0 \leftarrow (V,E_{G_0}) \tab : \tab E_{G_0} \leftarrow \bigcup_{i=1}^n E_{X_i}$\\
+\pc $\forall \; 1 \leq t \leq t_\text{max} \tab $\{ \\
+\pcIncIndent
+\pc   $G_t \leftarrow $ sampleG$(X, \theta_{t-1}, \odds(L))$ \\
+\pc   $\theta_{t} \leftarrow $ sampleTheta$(G_t)$\\ 
+\pcDecIndent
+\pc \}\\
+\pc $\theta_\text{final} \leftarrow  \expect(\theta_1 , \ldots , \theta_n)$\\
+\pc $p \leftarrow \text{computePosterior}(X,\theta_\text{final})$ \\
+\pcDecIndent
+\pc \}\\
+\pc\\
+\pc\\
+\pc sampleG$(X, \theta_t, \odds(L))$ \{\\
+\pcIncIndent
+\pc $p \leftarrow \text{computePosterior}(X,\theta_t)$ \\
+\pc $\forall \; e \in \binom{V}{2} \tab \{$\\
+\pcIncIndent
+\pc $r \sim \mathcal{U}_{[0,1]}$\\
+\pc $E_{G_t} \leftarrow 
+\begin{cases}
+  r < p(e) & E_{G_{t-1}} \cup \{e\}\\
+  r \geq p(e) & E_{G_{t-1}} \setminus \{e\}
+\end{cases}$\\
+\pcDecIndent
+\pc \}\\
+\pcDecIndent
+\pc \}\\
+\pc\\
+\pc\\
+\pc sampleTheta$(G_t)$ \{\\
+\pcIncIndent
+\pc $\forall \; 1 \leq i \leq n $ \{\\
+\pcIncIndent
+\pc $tp_i \leftarrow |E_{X_i} \cap E_{G_t}|$\\
+\pc $fp_i \leftarrow |E_{X_i} \setminus E_{G_t}|$\\
+\pc $tn_i \leftarrow |\binom{V}{2} \setminus (E_{X_i} \cup E_{G_t})|$\\
+\pc $fn_i \leftarrow | E_{G_t} \setminus E_{X_i}|$\\
+\pc $\alpha_i \sim Be(fp_i+1, tn_i+1)$\\
+\pc $\beta_i \sim Be(fn_i+1, tp_i+1)$\\
+\pcDecIndent
+\pc \}\\
+\pc $\theta_t \leftarrow \{(\alpha_1 , \beta_1), \ldots , (\alpha_n , \beta_n) \}$\\
+\pcDecIndent
+\pc \}\\
+\pc\\
+\pc\\
+\pc computePosterior$(X,\theta_t, \odds(L))$ \{ \\
+\pcIncIndent
+\pc $\forall \; 1 \leq i \leq n \tab\tab \Lambda^{(+)}_i \leftarrow \frac{1-\beta_i}{\alpha_i} \tab,\tab \Lambda^{(-)}_i \leftarrow \frac{\beta}{1-\alpha}$\\
+\pc $\forall \; e \in \binom{V}{2} \tab \{$\\
+\pcIncIndent
+\pc $K_e \leftarrow \ln(\odds(L)) + \sum_{i=1}^n \ln 
+  \begin{cases}
+  e \in E_{X_i} & \Lambda^{(+)}_i\\
+  e \notin E_{X_i} & \Lambda^{(-)}_i
+  \end{cases}
+ $\\
+\pc $p(e) \leftarrow \frac{\exp(K_e)}{1 + \exp(K_e)}$\\
+\pcDecIndent
+\pc \}\\
+\pcDecIndent
+\pc \}
+}

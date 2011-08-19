@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://cs.ncl.ac.uk/harness/protocol"
+    elementFormDefault="qualified" xmlns:tns="http://cs.ncl.ac.uk/harness/protocol">
+    <xsd:element name="protocol">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="variables" minOccurs="0">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="incrementalVariable" maxOccurs="unbounded" minOccurs="0">
+                                <xsd:complexType>
+                                    <xsd:attribute name="id" type="xsd:ID" use="required"/>
+                                    <xsd:attribute name="min" type="xsd:double" use="required"/>
+                                    <xsd:attribute name="max" type="xsd:double" use="required"/>
+                                    <xsd:attribute name="inc" type="xsd:double" use="required"/>
+                                </xsd:complexType>
+                            </xsd:element>
+                            <xsd:element name="logarithmicVariable" minOccurs="0" maxOccurs="unbounded">
+                                <xsd:complexType>
+                                    <xsd:attribute name="id" type="xsd:ID" use="required"/>
+                                    <xsd:attribute name="range" type="xsd:string" use="required"/>
+                                    <xsd:attribute name="iterations" type="xsd:int" use="required"/>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+                <xsd:element name="graphImplementation">
+                    <xsd:complexType>
+                        <xsd:attribute name="type" type="xsd:string" use="required"/>
+                    </xsd:complexType>
+                </xsd:element>
+                <xsd:element name="graphPopulation">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="properties" type="tns:propertyListType"/>
+                        </xsd:sequence>
+                        <xsd:attribute name="type" type="xsd:string" use="required"/>
+                    </xsd:complexType>
+                </xsd:element>
+                <xsd:element name="integration">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="goldStandards" minOccurs="0" type="tns:experimentListType"></xsd:element>
+                            <xsd:element name="evidentialGraphs" maxOccurs="1" type="tns:experimentListType"></xsd:element>
+                            <xsd:element name="properties" minOccurs="0" type="tns:propertyListType"/>
+                        </xsd:sequence>
+                        <xsd:attribute name="type" type="xsd:string" use="required"/>
+                        <xsd:attribute name="cycleReplicas" type="xsd:int"/>
+                    </xsd:complexType>
+                </xsd:element>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:complexType name="propertyListType">
+        <xsd:sequence>
+            <xsd:element name="staticProperty" maxOccurs="unbounded" minOccurs="0">
+                <xsd:complexType>
+                    <xsd:attribute name="key" type="xsd:string" use="required"/>
+                    <xsd:attribute name="type" type="xsd:string" use="required"/>
+                    <xsd:attribute name="value" type="xsd:string" use="required"/>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="variableProperty" minOccurs="0" maxOccurs="unbounded">
+                <xsd:complexType>
+                    <xsd:attribute name="key" type="xsd:string" use="required"/>
+                    <xsd:attribute name="type" type="xsd:string" use="required"/>
+                    <xsd:attribute name="var-ref" type="xsd:IDREF" use="required"/>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="experimentListType">
+        <xsd:sequence>
+            <xsd:element name="experiment" maxOccurs="unbounded">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:choice>
+                            <xsd:element name="variableReplicas">
+                                <xsd:complexType>
+                                    <xsd:attribute name="var-ref" type="xsd:IDREF" use="required"/>
+                                </xsd:complexType>
+                            </xsd:element>
+                            <xsd:element name="staticReplicas">
+                                <xsd:complexType>
+                                    <xsd:attribute name="value" type="xsd:int" use="required"/>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:choice>
+                        <xsd:element name="properties" type="tns:propertyListType"/>
+                    </xsd:sequence>
+                    <xsd:attribute name="type" type="xsd:string" use="required"/>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+</xsd:schema>

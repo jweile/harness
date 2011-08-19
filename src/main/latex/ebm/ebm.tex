@@ -1,0 +1,642 @@
+\documentclass{scrartcl}
+
+\usepackage[british]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}  %theorem definition dependency
+%\usepackage{moreverb} %source code listing dependency
+%\usepackage{textcomp} %source code listing dependency
+%\usepackage{listings} %source code listing dependency
+\usepackage{color}    %source code listing dependency
+\usepackage{titling}  %pdf metadata dependency
+\usepackage{ifpdf}    %pdf metadata dependency
+%\usepackage{graphicx}
+%\usepackage{caption}
+%\usepackage{pstricks}
+\usepackage{forloop}
+
+%% DOCUMENT METADATA %%
+
+\title{Integrating experimental networks in the absence of Gold Standards}
+\author{Jochen Weile, M.Sc.}
+\date{\today}
+
+%% LAYOUT OPTIONS %%
+\setlength{\parindent}{0ex}
+\setlength{\parskip}{1ex}
+
+%% CONFIGURE CODE HIGHLIGHTING %%
+%\lstset{
+%	tabsize=4,
+%	language=Java,
+%  basicstyle=\footnotesize,
+%  upquote=true,
+%  aboveskip={1.5\baselineskip},
+%  columns=fixed,
+%  showstringspaces=false,
+%  extendedchars=true,
+%  breaklines=true,
+%  prebreak = \raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}},
+%  frame=none,
+%  showtabs=false,
+%  showspaces=false,
+%  showstringspaces=false,
+%  identifierstyle=\ttfamily,
+%  keywordstyle=\bf\color[rgb]{0.5,0,0.7},
+%  commentstyle=\color[rgb]{0.5,0.5,0.5},
+%  stringstyle=\color[rgb]{0,0,1},
+%}
+
+%% SUPPORT FOR PDF METADATA %%
+\ifpdf
+	\pdfinfo {
+		/Author (\theauthor)
+		/Title (\thetitle)
+		/CreationDate (D:20110216120000)
+	}
+\fi
+
+%% DEFINE MACROS %%
+\newcommand{\prob}{\mathbb{P}}
+\newcommand{\odds}{\mathbb{O}}
+\newcommand{\likeli}{\mathcal{L}}
+\newcommand{\model}{\mathcal{H}}
+\newcommand{\p}{\text{p}}
+\newcommand{\expect}{\mathbb{E}}
+\newcommand{\pardiff}[1]{\frac{\partial}{\partial #1}}
+\newcommand{\remark}[1]{\begin{center}\fcolorbox{black}{yellow}{\parbox{.8\textwidth}{#1}}\end{center}}
+
+%% DEFINE ENVIRONMENTS %%
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{Definition}
+
+
+
+
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction} 
+
+
+\paragraph{Aim:} We are given $n$ experimentally measured networks, which we want to integrate. We want to assign an existence probability to each edge in our integrated network, based on the qualities of the experimental networks.
+
+\section{Basic notions and definitions}
+
+%\subsection{Graphs}
+
+%\begin{definition}
+%An (undirected) graph or network is a pair $G=(V,E)$ where $V$ is the set of vertices (nodes) and $E \subseteq \binom{V}{2}$ is the set of edges(arcs).
+%\end{definition}
+
+%\subsection{Probabilistics}
+
+%\begin{definition}[Conditional probability]
+%Let $A$ and $B$ be two events, then $$\prob(A|B)$$ denotes the conditional probability of event $A$ given the occurrence of event $B$. 
+%\end{definition}
+
+%\begin{theorem}[Bayes's theorem]
+%Let $A$ and $B$ be two events, then $$\prob(A|B)=\frac{\prob(B|A)\cdot \prob(A)}{\prob(B)}$$
+%\begin{description}
+% \item[$\prob(A|B)$] is called the posterior probability of $A$ given $B$; 
+% \item[$\prob(B|A)$] is called the likelihood of $B$ given $A$; 
+% \item[$\prob(A)$] is called the prior probability of $A$; and 
+% \item[$\prob(B)$] is called the marginal probability of $B$.
+%\end{description}
+%\end{theorem}
+
+%\begin{definition}[Odds]
+%The odds of an event $A$ are defined as $$ \odds(A) = \frac{\prob(A)}{\prob(\overline{A})} $$
+%\end{definition}
+
+\subsection{Experimental networks}
+Let 
+$$G = (V, E_G) \text{ , with vertices } V \text{ and edges } E_G \subseteq \binom{V}{2}$$ 
+be a true network. 
+Furthermore, let $X = (X_1, \ldots , X_n)$ be a vector of $n$ networks, that have been experimentally derived from $G$, where
+$$X_i = (V, E_{X_i}) \text{ with the same vertices } V \text{ and different edges } E_{X_i} \subseteq \binom{V}{2} \,\,\forall\, 1 \le i \le n$$
+
+Now, consider a potential edge $e \in \binom{V}{2}$. Then,
+\begin{description}
+	\item[$e \in E_{X_i}$] means that the experiment $X_i$ predicts that the edge $e$ exists.
+	\item[$e \notin E_{X_i}$] means that the experiment $X_i$ predicts that the edge $e$ \textbf{does not} exist.
+	\item[$e \in E_G$] means that the edge $e$ really exists.
+	\item[$e \notin E_G$] means that the edge $e$ \textbf{does not} really exist.
+\end{description}
+
+\subsection{Edge prediction as a random event}
+We can model the prediction of potential edge $e \in \binom{V}{2}$ as a random event. Let $D_i$ be a random variable, that assumes realisation 1 when $X_i$ predicts $e$ to exist and assumes realisation 0 when $X_i$ predicts $e$ to not exist. Let $$d_i = \mathbb{I}(e \in E_{X_i})$$ be the measured realisation of $D_i$, then $(D_i = d_i)$ is the event that $D_i$ assumes our measured realisation $d_i$.
+Finally, let $$L \equiv (e \in E_G)$$ be the event that the edge really exists.
+
+
+\section{Methods}
+
+\subsection{Inferring edge probability from singular evidence}
+
+We want to define the probability for an edge to really exist based on the prediction $d_i$ our experiment made. That is, we are interested in $\prob(L|D_i = d_i)$. For simplicity's sake we will abbreviate $\prob(L|D_i = d_i)$ as $\prob(L|d_i)$ in the following. Bayes's theorem gives us:
+
+$$\prob(L|d_i) = \frac{\prob(d_i|L)\cdot \prob(L)}{\prob(d_i)}$$
+
+However, since this form of notation can be more complicated than necessary for what we want to do in the following, we are converting our probabilities into \textit{odds} and apply Bayes's theorem again.
+
+\begin{align}
+\odds(L|d_i) &= \frac{\prob(L|d_i)}{\prob(\overline{L}|d_i)} = \frac{\frac{\prob(d_i|L)\cdot \prob(L)}{\prob(d_i)}}{\frac{\prob(d_i|\overline{L})\cdot \prob(\overline{L})}{\prob(d_i)}} \notag\\
+ &= \frac{\prob(d_i|L)\cdot \prob(L)}{\prob(d_i|\overline{L}) \cdot \prob(\overline{L})} \notag\\
+ &= \frac{\prob(d_i|L)}{\prob(d_i|\overline{L})} \cdot \odds(L) 
+ \label{deduction_odds_edge}
+\end{align}
+
+$\odds(L)$ is the prior odds of an edge to really exist. We can estimate this number, but we will talk about that later. More important is the Bayes factor $\frac{\prob(d_i|L)}{\prob(d_i|\overline{L})}$. Let us call it $\Lambda_i$:
+
+\begin{equation}
+\label{def_lambda}
+\Lambda_i := \frac{\prob(d_i|L)}{\prob(d_i|\overline{L})}
+\end{equation}
+
+Applying that definition \eqref{def_lambda} to our above equation \eqref{deduction_odds_edge}, we can write it down like this:
+
+\begin{equation}
+\label{odds_of_edge_pos}
+\odds(L|d_i) = \Lambda_i \cdot \odds(L)
+\end{equation}
+
+
+\subsubsection{The Bayes factor}
+\label{bayes_factor}
+
+We see that the Bayes factor $\Lambda_i$ plays an important role. What exactly is it? 
+\begin{itemize}
+	\item In the case of $d_i = 1$
+	\begin{itemize}
+		\item The numerator $\prob(d_i = 1|L)$ is the probability of $X_i$ correctly reporting the edge that really exists. That is, the probability of producing a True Positive.
+		\item The denominator $\prob(d_i = 1|\overline{L})$ is the probability of $X_i$ incorrectly reporting the edge, although it does not really exist. That is, the probability of producing a False Positive.
+	\end{itemize}
+	\item In the case of $d_i = 0$
+	\begin{itemize}
+		\item The numerator $\prob(d_i = 0|L)$ is the probability of $X_i$ incorrectly not reporting the edge although it really exists. That is, the probability of producing a False Negative. 
+		\item The denominator $\prob(d_i = 0|\overline{L})$ is the probability of $X_i$ correctly not reporting the edge that does not really exist. That is the probability of producing a True Negative.
+	\end{itemize}
+\end{itemize}
+
+So, suppose we knew the following numbers:
+
+\begin{description}
+	\item[$\alpha_i$]: The false positives rate in experiment $i$. That is, the share of false positives in the set of all not really existing edges..
+	\item[$\beta_i$]: The false negative rate in experiment $i$. That is, the share of false negatives in the set of all really existing edges.
+\end{description}
+
+Then we could estimate $\Lambda_i$ as follows:
+
+$$
+\Lambda_i = \frac{\prob(d_i|L)}{\prob(d_i|\overline{L})} \approx
+\begin{cases}
+	d_i=1 & \frac{1-\beta_i}{\alpha_i}\\
+	\text{otherwise} & \frac{\beta}{1-\alpha}
+\end{cases}
+$$
+
+
+
+
+
+
+
+\subsection{Inferring edge probability from multiple evidence}
+
+Now, we are interested in the odds of our edge to really exist considering \textbf{all} the different experimental networks. To answer this question we look at the problem from a recursive perspective. 
+
+Let $$D^{(n)} = \bigwedge_{i=1}^n (D_i = d_i)$$ be the combined event of observing the existence or non-existence of edge $e$ in all of our experimental networks.
+
+Then, the odds $\odds(L|D^{(n)})$ for an edge existing given the predictions from all $n$ experiments is the same as the edge existing given the $n$'th network $D_n$ \textbf{and} the set of the remaining ones $D^{(n-1)}$. Using \eqref{odds_of_edge_pos} We can deduce:
+
+\begin{align*}
+\odds(L | D^{(n)} ) &= \odds(L | d_n \wedge D^{(n-1)}) \\
+ &= \frac{\prob( d_n \wedge D^{(n-1)} | L) \cdot \prob(L)}{\prob( d_n \wedge D^{(n-1)} | \overline{L}) \cdot \prob(\overline{L}) } \\
+ &= \frac{\prob( d_n |L) \cdot \prob( D^{(n-1)} | L) \cdot \prob(L)}{\prob( d_n |L) \cdot \prob( D^{(n-1)} | \overline{L}) \cdot \prob(\overline{L}) } \\
+ &= \Lambda_n \cdot \frac{\prob( D^{(n-1)} | L)}{\prob( D^{(n-1)} | \overline{L})} \cdot \odds(L)\\
+ &= \Lambda_n \cdot \frac{\prob(L| D^{(n-1)}) \cdot \prob(D^{(n-1)}) \cdot \prob(\overline{L})}{\prob(\overline{L} | D^{(n-1)}) \cdot \prob(D^{(n-1)}) \cdot \prob(L)} \cdot \odds(L) \\
+ &= \Lambda_n \cdot \odds(L|D^{(n-1)}) \cdot \odds(\overline{L}) \cdot \odds(L) \\
+ &= \Lambda_n \cdot \odds(L|D^{(n-1)})
+\end{align*}
+
+You may have noticed that the third step in the above deduction is only allowed if all $d_i$s are independent from each other. To be honest: they are not, but we have no idea how to account for it. 
+
+Moving on, we can turn this recursive formula into an iterative one:
+
+\begin{equation}
+\label{main_eq}
+\odds(L | D^{(n)} ) =  \prod_{i=1}^n \Lambda_i  \cdot \odds(L)
+\end{equation}
+
+with $\odds(L)$ being the prior probability of an edge existing in the real world network. 
+
+
+
+
+\subsubsection{Avoiding computational restrictions}
+
+Formula (\ref{main_eq}) is computationally inconvenient, because it can lead to numbers very close to zero, which might suffer from precision loss when stored in a binary floating-point format. It is more feasible to use their logarithms in this case. Instead of storing the two possible solutions to $\Lambda_i$, we can simply store the two solutions of $\ln(\Lambda_i)$ for each dataset. Then we can turn equation (\ref{main_eq}) into:
+
+$$\ln(\odds(L|D^{(n)})) = \sum_{i=1}^n \ln (\Lambda_i) + \ln(\odds(L)) =: K$$
+
+This function yields a log-odds, which we have called $K$. In order to turn the log-odds $K$ back into a probability, we can use the logistic function:
+
+$$\prob(L | D^{(n)}) = \frac{e^K}{1 + e^K}$$
+
+
+If we use the integration method described above, it yields global assessment of the probabilities of edge existence over all potential edges. This can be described as the map
+$$ \p: \binom{V}{2} \rightarrow [0,1] $$
+
+\subsection{Finding suitable error rate parameters}
+
+The method described above still relies on the knowledge of values for $\alpha_i$ and $\beta_i$. However these numbers are not known to us, since we have no knowledge of the true network.
+
+One way to overcome this problem would be to start with rough estimates on these parameter values, and use them to create a candidate integrated network. Then one could iteratively compute better parameter values and resulting integrated networks. This step could be repeated until a reasonable network is found. However, the produced series of networks cannot be expected to converge to the global maximum.
+
+
+
+%\clearpage
+%\subsubsection{Expectation maximization}
+%To apply the EM algorithm approach, we must first find a way to express the expectation of our expression with respect to the true $G$:
+
+%\begin{align*}
+%  \expect_G \left [ \log \prob(X|\theta,G) \middle\vert X, \theta \right ] 
+%  &= \expect_G \left [ 
+%    \log \prod_{i=1}^n \prod_{e \in \binom{V}{2}} \prob(X_i^e|\theta_i,G) 
+%  \middle\vert X, \theta \right ]\\
+%  &= \sum_{i=1}^n \sum_{e \in \binom{V}{2}}
+%     \expect_G [ \log \prob(X_i^e|\theta_i,G) | X, \theta ]\\
+%  &= \sum_{i=1}^n \sum_{e \in \binom{V}{2}}
+%     \expect_G [ \log (\Theta_{X,G,\theta}(i,e)) | X, \theta ]\\
+%\end{align*}
+
+%Let $\Gamma$ be the set of all possible graphs with $v$ nodes. Then, applying the definition of expectation to the above equation we can say:
+
+%$$\expect_G [ \log (\Theta_{X,G,\theta}(i,e)) | X, \theta ] = \sum_{G \in \Gamma} \log(\Theta_{X,G,\theta}(i,e)) \cdot \prob(G|X,\theta) $$
+
+%Now let $\Gamma^{(e+)} \subset \Gamma$ be the set of all graphs that contain $e$ and let $\Gamma^{(e-)} \subset \Gamma$ be the set of all graphs that \textbf{do not} contain $e$. Furthermore let
+%$$ \Theta_{X,\theta}^{(+)}(i,e) = 
+%\begin{cases}
+%  e \in E_{X_i}: & 1- \beta_i\\
+%  e \notin E_{X_i}: & \beta_i
+%\end{cases}
+%$$
+%and 
+%$$ \Theta_{X,\theta}^{(-)}(i,e) = 
+%\begin{cases}
+%  e \in E_{X_i}: & \alpha_i\\
+%  e \notin E_{X_i}: & 1-\alpha_i
+%\end{cases}
+%$$
+%Then 
+
+%\begin{align*}
+%  \expect_G & \left [ \log \prob(X|\theta,G) \middle\vert X, \theta \right ] \\
+%  &= \sum_{i=1}^n \sum_{e \in \binom{V}{2}}
+%     \sum_{G \in \Gamma} \log(\Theta_{X,G,\theta}(i,e)) \cdot \prob(G|X,\theta)\\
+%  &= \sum_{i=1}^n \sum_{e \in \binom{V}{2}}
+%     \left ( \sum_{G \in \Gamma^{(e+)}} \log(\Theta_{X,\theta}^{(+)}(i,e)) \cdot \prob(G|X,\theta) \right )
+%     + \left ( \sum_{G \in \Gamma^{(e-)}} \log(\Theta_{X,\theta}^{(-)}(i,e)) \cdot \prob(G|X,\theta) \right )\\
+%  &= \sum_{i=1}^n \sum_{e \in \binom{V}{2}}
+%     \left (\log(\Theta_{X,\theta}^{(+)}(i,e)) \sum_{G \in \Gamma^{(e+)}}  \prob(G|X,\theta) \right )
+%     + \left (\log(\Theta_{X,\theta}^{(-)}(i,e)) \sum_{G \in \Gamma^{(e-)}}  \prob(G|X,\theta) \right )\\
+%  &= \sum_{i=1}^n \sum_{e \in \binom{V}{2}}
+%     \log(\Theta_{X,\theta}^{(+)}(i,e)) \cdot \expect_G[\mathbb{I}(e \in E_G) | X,\theta] 
+%     + \log(\Theta_{X,\theta}^{(-)}(i,e)) \cdot \expect_G[\mathbb{I}(e \notin E_G) | X,\theta]\\
+%  &= \sum_{i=1}^n \sum_{e \in \binom{V}{2}}
+%     \log(\Theta_{X,\theta}^{(+)}(i,e)) \cdot \p(e) 
+%     + \log(\Theta_{X,\theta}^{(-)}(i,e)) \cdot (1-\p(e)) 
+%\end{align*}
+
+%Let's split up the sum according to those experimental graphs $X_i$ that contain an edge or do not contain an edge:
+
+%\begin{align*}
+%   \sum_{e \in \binom{V}{2}} & \left ( 
+%     \sum_{X_i \in X^{(e+)}} 
+%     \log(1-\beta_i) \cdot \p(e) 
+%     + \log(\beta_i) \cdot (1-\p(e)) 
+%     \right ) \\
+%     &+ \left (
+%     \sum_{X_i \in X^{(e-)}}
+%     \log(\alpha_i) \cdot \p(e) 
+%     + \log(1-\alpha_i) \cdot (1-\p(e))
+%     \right )
+%\end{align*}
+
+%Next we want to find the maximum for $\theta = ((\alpha_1,\beta_1), \ldots, (\alpha_n,\beta_n))$. We'll have to do this for every $i$ separately, but fortunately, maximizing each member of the sum should also maximize the sum. 
+
+%Looking at the function itself it seems that if the average $p(e)$ over all edges is greater than 0.5, then $\beta_i = 0$ and $\alpha_i = 1$ maximizes the term. If the average $p(e)$ over all edges is less than 0.5, then $\beta_i = 1$ and $\alpha_i = 0$ maximizes the term. Now that is not helpful at all. Because we know the optimal value should be a bit more fine-tuned than that.
+
+%But maybe I'm wrong, so let's try to find the partial derivatives for the $i$th $\alpha$ and $\beta$.
+
+%\begin{align*}
+%  \pardiff{\alpha_i} 
+%  \sum_{e \in \binom{V}{2}} & \left ( 
+%     \sum_{X_i \in X^{(e+)}} 
+%     \log(1-\beta_i) \cdot \p(e) 
+%     + \log(\beta_i) \cdot (1-\p(e)) 
+%     \right ) \\
+%     &+ \left (
+%     \sum_{X_i \in X^{(e-)}}
+%     \log(\alpha_i) \cdot \p(e) 
+%     + \log(1-\alpha_i) \cdot (1-\p(e))
+%     \right )
+%\end{align*}
+
+%\paragraph{Case: $e \in E_{X_i}$}
+
+%\begin{align*}
+%  \sum_{e \in \binom{V}{2}} & \left ( 
+%     \sum_{X_i \in X^{(e+)}} 
+%     \pardiff{\alpha_i} 
+%     \log(1-\beta_i) \cdot \p(e) 
+%     + \pardiff{\alpha_i} 
+%     \log(\beta_i) \cdot (1-\p(e)) 
+%     \right ) \\
+%  &= 0
+%\end{align*}
+
+%\paragraph{Case: $e \notin E_{X_i}$}
+
+%\begin{align*}
+%  \sum_{e \in \binom{V}{2}} & \left ( 
+%     \sum_{X_i \in X^{(e-)}} 
+%     \pardiff{\alpha_i} 
+%     \log(\alpha_i) \cdot \p(e) 
+%     + \pardiff{\alpha_i} 
+%     \log(1- \alpha_i) \cdot (1-\p(e)) 
+%     \right ) \\
+%  &= \sum_{e \in \binom{V}{2}} 
+%     \pardiff{\alpha_i} 
+%     \log(\alpha_i) \cdot \p(e) 
+%     + \pardiff{\alpha_i} 
+%     \log(1- \alpha_i) \cdot (1-\p(e)) \\
+%  &= \sum_{e \in \binom{V}{2}} 
+%     \frac{p(e)}{\alpha_i} + \frac{1-p(e)}{1-\alpha_i}
+%\end{align*}
+
+%Combining both cases:
+%\begin{align*}
+%  \sum_{e \in \binom{V}{2} \setminus E_{X_i}} & 
+%    \frac{p(e)}{\alpha_i} + \frac{1-p(e)}{1-\alpha_i}\\
+%  &= \frac{|\binom{V}{2} \setminus E_{X_i}| \cdot \alpha_i}{\alpha_i - \alpha_i^2} 
+%    \sum_{e \in \binom{V}{2} \setminus E_{X_i}} p(e)
+%\end{align*}
+
+%Unfortunately, there is no $\alpha_i$ for which this term equals zero. (Unless all p(e) are zero, but that is not the point). For $\alpha_i = 0$ and $\alpha_i = 1$ the term is not even defined.
+
+%Maybe I should look into MCMC instead.
+
+
+
+
+To avoid this problem we use a Markov Chain Monte Carlo approach. The idea would be to alternately generate \textit{samples} for our error rate vector $\theta$ and for a potential true background graph $G$. This will result in a random walk. The better fit a particular state is the more likely it is to be assumed during the random walk. Thus, averaging over all intermediate steps should yield the best fitting parameter configuration. This approach poses five problems:
+\begin{enumerate}
+  \item Choosing an initial error rate vector $\theta_{\text{init}}$
+  \item Sampling a potential true graph $G$, based on a given error rate vector $\theta$
+  \item Sampling an error rate vector $\theta$ based on a true graph $G$
+  \item Determining the likelihood of the current state $(\theta,G)$
+  \item Averaging over random walk states.
+\end{enumerate}
+
+\subsubsection{Choosing an initial error rate vector $\theta_{\text{init}}$}
+
+For now we will sample the initial values for $\alpha$ and $\beta$ from the uniform distribution $\mathcal{U}_{[0,1]}$. This also makes sense in the light of the details discussed in subsection \ref{sampling_theta}, since $\mathcal{U}_{[0,1]} = Be(1,1)$.
+
+
+
+\subsubsection{Sampling a potential true graph $G$, based on a given error rate vector $\theta$}
+
+Given an error rate vector $\theta$ we can use the integration method discussed above to infer posterior existence probabilities for each edge. We can use these probabilities to sample a potential $G$ by lookup. For each potential edge, we sample a $\mathcal{U}_{[0,1]}$ random number. If that random number is smaller than the posterior existence probability of that edge, we say exists. Otherwise we say it does not exist.
+
+
+
+\subsubsection{Sampling an error rate vector $\theta$ based on a true graph $G$}
+\label{sampling_theta}
+
+To find a suitable distribution from which to sample these values, we should have a look at their nature. The error rates $\alpha$ and $\beta$ behave like the success rates for misreading each potential edge. So if we model each observation event over a potential edge as a Bernoulli experiment with such a success rate, the number of False Positives and False Negatives in an experimental graph $X_i$ would follow a binomial distribution. So how can we sample the success rates for a binomial distribution? Such is a accomplished using the Beta distribution. The Beta distribution takes two parameters, $a$ and $b$. $a$ and $b$ can be interpreted as one plus the number of successes and failures in a binomial distributed data set.
+
+So if we compare $X_i$ to our currently assumed true graph $G$ and use it to count the number of True Positives (tp), False Positives (fp), True Negatives (tn) and False Negatives (fn), we can sample $alpha$ and $beta$ as follows:
+\begin{align*}
+  \alpha_i &\sim Be(\text{fp}_i+1, \text{tn}_i+1)\\
+  \beta_i &\sim Be(\text{fn}_i+1, \text{tp}_i+1)
+\end{align*}
+
+
+
+\subsubsection{Determining the likelihood of the current state $(\theta,G)$:}
+
+The likelihood of the current state can be computed using the posterior 
+
+$$\pi(\theta,G|X)$$
+We cannot determine this directly. But we know that 
+$$ \pi(\theta,G|X) = \frac{\pi(\theta,G,X)}{\prob(X)} $$
+So the posterior distribution $\pi(\theta,G|X)$ is proportional to the joint distribution $\pi(\theta,G,X)$. We can determine the joint distribution as follows:
+$$ \pi(\theta,G,X) = \pi(G)\cdot\pi(\theta)\cdot\prob(X|\theta,G) $$
+Hence we can say that $$ \pi(\theta,G|X) \propto \pi(G)\cdot\pi(\theta)\cdot\prob(X|\theta,G) $$
+So we need to determine the prior distribution $\pi(G)$, the prior distribution $\pi(\theta)$ and the likelihood $\prob(X|\theta,G)$.
+
+\paragraph{Prior probability of $G$}
+\begin{align*}
+  \pi(G) &= \prod_{e \in \binom{V}{2}} \pi(G_e) \\
+         &= (1-q)^{\left |\binom{V}{2}\setminus E_G \right |} \cdot q^{|E_G|}
+\end{align*}
+where $q$ is the prior probability of an edge to really exist.
+
+\paragraph{Prior probability of $\theta$}
+
+As discussed above, we assume a $Be(1,1)$ distribution for our $\alpha$ and $\beta$ values. 
+
+The probability density function for the beta distribution is:
+$$ f(x;\alpha,\beta) = \frac{x^{\alpha-1}(1-x)^{\beta-1}}{\int_0^1 u^{\alpha-1} (1-u)^{\beta-1}\, du} $$
+
+Thus, for $\alpha = \beta = 1$ :
+$$ \pi(\theta) = f(\theta,1,1) = \frac{\theta^{0}(1-\theta)^{0}}{\int_0^1 u^{0} (1-u)^{0}\, du} = 1$$
+
+So we might as well ignore this factor.
+
+\paragraph{Posterior probability of $\theta$ and $G$}
+
+  
+\begin{align*}
+  \prob(X|\theta, G) &= \prod_{i=1}^n \prob(X_i|\theta_i,G)\\
+  &= \prod_{i=1}^n \prod_{e \in \binom{V}{2}} \prob( \mathbb{I}(e \in E_{X_i})|\theta_i,G)\\
+  &= \prod_{i=1}^n \prod_{e \in \binom{V}{2}} \begin{cases}
+    e \in E_G: & 
+    \begin{cases}
+      e \in E_{X_i}: & 1-\beta_i\\
+      e \notin E_{X_i}: & \beta_i
+    \end{cases}
+    \\
+    e \notin E_G: & 
+    \begin{cases}
+      e \in E_{X_i}: & \alpha_i\\
+      e \notin E_{X_i}: & 1-\alpha_i
+    \end{cases}
+  \end{cases}
+\end{align*}
+
+However, since we don't know $G$, we will have to marginalize $G$ out. There are two possible courses of action: Using the Expectation-maximization (EM) algorithm or using a Markov chain Monte Carlo (MCMC) approach.
+
+
+\paragraph{Adjustment for binary floating-point representation}
+
+Again, since the likelihood value can be expected smaller than our machine floating-point precision, we will have to apply a logarithm function.
+
+\begin{align*}
+  \log\pi(\theta,G|X) &\propto \log (\pi(G)\cdot\pi(\theta)\cdot\prob(X|\theta,G))\\
+    &= \log\pi(G)+\log\pi(\theta)+\log\prob(X|\theta,G)\\
+    &= \log((1-q)^{\left |\binom{V}{2}\setminus E_G \right |} \cdot q^{|E_G|})
+       + \log(1)\\
+       &\hspace{4ex} + \log\left ( \prod_{i=1}^n \prod_{e \in \binom{V}{2}} \begin{cases}
+				e \in E_G: & 
+				\begin{cases}
+				  e \in E_{X_i}: & 1-\beta_i\\
+				  e \notin E_{X_i}: & \beta_i
+				\end{cases}
+				\\
+				e \notin E_G: & 
+				\begin{cases}
+				  e \in E_{X_i}: & \alpha_i\\
+				  e \notin E_{X_i}: & 1-\alpha_i
+				\end{cases}
+			\end{cases} \right )\\
+		&= \left |\binom{V}{2}\setminus E_G \right | \cdot \log(1-q) + |E_G|\cdot \log q\\
+		&\hspace{4ex} + \sum_{i=1}^n \sum_{e \in \binom{V}{2}} \begin{cases}
+				e \in E_G: & 
+				\begin{cases}
+				  e \in E_{X_i}: & \log(1-\beta_i)\\
+				  e \notin E_{X_i}: & \log\beta_i
+				\end{cases}
+				\\
+				e \notin E_G: & 
+				\begin{cases}
+				  e \in E_{X_i}: & \log\alpha_i\\
+				  e \notin E_{X_i}: & \log(1-\alpha_i)
+				\end{cases}
+			\end{cases}
+\end{align*}
+
+
+\subsubsection{Averaging over random walk states}
+
+If we do not wish to store all intermediate results we can keep an incremental mean value for each $\alpha_i$ and $\beta_i$ value. This is achieved using the recursive definition of the mean. Let $\{a\}_{N+1}$ be a series of $N+1$ numbers, then
+
+\begin{align*}
+  \expect(\{a\}_{N+1}) &= \frac{1}{N+1}  \sum_{k=1}^{N+1} a_k \\
+    &= \frac{N}{N+1} \frac{1}{N} \left ( \sum_{k=1}^{N} a_k + a_{N+1}\right )\\
+    &= \frac{N}{N+1} \left ( \frac{1}{N}\sum_{k=1}^{N} a_k + \frac{1}{N} a_{N+1}\right )\\
+    &= \frac{N}{N+1} \left ( \expect(\{a\}_{N}) + \frac{1}{N} a_{N+1}\right )\\
+\end{align*}
+
+\subsection{Pseudocode}
+
+\fbox{\parbox{\textwidth}{\scriptsize \input{pseudocode.tex}}}
+
+%\subsubsection{Post-processing: Finding the highest peak in the state distributions}
+
+%We try to find the optimal configuration of $\theta$, which consists of $n$ $(\alpha_i,\beta_i)$ pairs. That's $2n$ numbers between 0 and 1. So we can say the optimal $\theta$ is a point in a $2n$-dimensional hypercube. Having recorded all the intermediate states of $\theta$ and their associated likelihoods, we can raster-scan the hypercube in a number of steps. In the first step we divide each dimension in to $r$ intervals of equal sizes (thus dividing the hypercube into $r^{2n}$ sectors. Now we sort our recorded values into these sectors, adding their associated likelihoods to the of the sector. In each subsequent step we choose the sector with the highest likelihood sum from the previous iteration and repeat the procedure (subdivide and scan).
+
+%Thus, given $s$ recorded states from the random walk, performing $d$ iterations will take $O((s + r^{2n}) \cdot d)$, reaching a precision of $r^{-d}$. As an example, given $n=5$ datasets, $s=10,000$ records, and interval size $r=2$, going for $d=100$ iterations takes 10,102,400 computing operations and reaches a precision of approximately $10^{-30}$ (which is smaller than binary floating point precision).
+
+%\remark{\textbf{Problem:} Adding up the likelihoods poses a problem, since they can only be stored as logarithms. Adding up logarithms of course would be wrong ($\ln a + \ln b \neq \ln(a+b)$). So we need to find some way of performing this operation without converting them back into numbers smaller than our machine precision.}
+
+
+
+
+
+
+%One way to overcome this problem would be to start with rough estimates on these parameter values, and use them to create a candidate integrated network. Then one could iteratively compute better parameter values and resulting integrated networks. This step could be repeated until a reasonable network is found. However, this idea suffers from two problems. (i) The produced series of networks cannot be expected to converge and (ii) a quantitative measure of the quality of would be required to assess whether a proposed solution is good or bad.
+%In the next section we will address the second problem.
+
+%\subsubsection{Assessing the likelihood of an integrated network model}
+
+%Given our experimentally measured networks $X$, let $\theta = \theta_1, \ldots \theta_n$ be a series of vectors containing estimated error rate parameters, where 
+%$$\theta_i = (\alpha_i, \beta_i) $$
+%for each network $X_i$.
+
+%If we use the integration method described above, it yields global assessment of the probabilities of edge existence over all potential edges. This can be described as the map
+%$$ \p: \binom{V}{2} \rightarrow [0,1] $$
+%Then we can write down a complete model of network integration as 
+%$$ \model = (\p, \{\theta_i\}_{1 \leq i \leq n}) $$
+
+%With these basic definitions we can now think about the likelihood of our model, given our experimental networks:
+
+%\begin{align*}
+%\likeli(\model | \{X_i\}_{1 \leq i \leq n}) &= \prob(\{X_i\}_{1 \leq i \leq n}| \model) = \prob \left (\bigwedge_{i=1}^n X_i | \model \right )\\
+%  &= \prod_{i=1}^n \prob(X_i | \model)\\
+%  &= \prod_{i=1}^n \prod_{e \in \binom{V}{2}} \prob(\mathbb{I}(e \in E_{X_i}) | \p(e) \wedge \theta_i)
+%\end{align*}
+
+%Again, here we step into the trap assuming that our experimental datasets are independent. But if we ignore that flaw for now we see that we end up with the product over all datasets for the product over all potential edges for the probability of observing the existence or non-existence, respectively, the selected edge, given our probability assessment for that edge and given our error rates for the selected dataset. Now what does that mean?
+
+%\begin{center}
+%	\begin{pspicture}(8,5)
+%		\psline{->}(4,5)(2,3)
+%		\rput(2.5,4){$\p(e)$}
+%		\rput(2,2.8){$e \in E_G$}
+%		
+%		\psline{->}(4,5)(6,3)
+%		\rput(5.8,4){$1-\p(e)$}
+%		\rput(6,2.8){$e \notin E_G$}
+%		
+%		\psline{->}(2,2.6)(1,1)
+%		\rput(1,2){$1-\beta_i$}
+%		\rput(1,0.8){$e \in E_{X_i}$}
+%		
+%		\psline{->}(2,2.6)(3,1)
+%		\rput(3,2){$\beta_i$}
+%		\rput(3,0.8){$e \notin E_{X_i}$}
+%		
+%		\psline{->}(6,2.6)(5,1)
+%		\rput(5,2){$\alpha_i$}
+%		\rput(5,0.8){$e \in E_{X_i}$}
+%		
+%		\psline{->}(6,2.6)(7,1)
+%		\rput(7,2){$1-\alpha_i$}
+%		\rput(7,0.8){$e \notin E_{X_i}$}
+%	\end{pspicture}
+%	
+%\end{center}
+
+%If we follow the decision tree above we can derive the probability of experiment $X_i$ observing existence or non-existence of an edge based on $\p(e)$ and $\theta_i=(\alpha_i , \beta_i)$.
+
+%$$
+%\prob(\mathbb{I}(e \in E_{X_i}) | \p(e) \wedge \theta_i) =
+%\begin{cases}
+%	e \in E_{X_i} & \p(e)(1-\beta) + \alpha(1-\p(e)) \\
+%	e \notin E_{X_i} & \beta \p(e)  + (1-\p(e))(1-\alpha)
+%\end{cases}
+%$$
+
+%We summarize:
+%$$
+%\likeli(\model | \{X_i\}_{1 \leq i \leq n}) = \prod_{i=1}^n \prod_{e \in \binom{V}{2}}
+%\begin{cases}
+%	e \in E_{X_i} & \p(e)(1-\beta) + \alpha(1-\p(e)) \\
+%	e \notin E_{X_i} & \beta \p(e)  + (1-\p(e))(1-\alpha)
+%\end{cases}
+%$$
+
+%\subsubsection{Convergence to maximal likelihood}
+
+%The second problem about the algorithm proposed earlier is to achieve convergence. We can currently think of two methods that could solve this problem:
+%\begin{description}
+%	\item[EM algorithm] An expectation maximization algorithm could be used. However, that method may only find local maxima.
+%	\item[MCMC algorithm] such as Gibbs sampling. 
+%\end{description}
+
+%More here...
+
+\end{document}
+
+
+
+
+
+
+
+
+

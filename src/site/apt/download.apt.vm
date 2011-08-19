@@ -1,0 +1,18 @@
+
+Download ${project.name}
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+  Please use the links below to download ${project.name}.
+
+
+* Binaries
+
+*------------------------------------------------------------------------+--------+----------+
+| {{{./download/${project.artifactId}-${project.version}.jar}${project.artifactId}-${project.version}.jar}}  |  {{{./download/${project.artifactId}-${project.version}.jar.md5}md5}}   |   pgp    |
+*------------------------------------------------------------------------+--------+----------+
+
+* Source
+
+*------------------------------------------------------------------------+--------+----------+
+| {{{./download/${project.artifactId}-${project.version}-sources.jar}${project.artifactId}-${project.version}-sources.jar}}  |  md5   |   pgp    |
+*------------------------------------------------------------------------+--------+----------+

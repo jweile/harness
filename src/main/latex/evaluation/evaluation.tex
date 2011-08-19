@@ -1,0 +1,135 @@
+\documentclass{scrartcl}
+
+\usepackage[british]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+%\usepackage{amsthm}  %theorem definition dependency
+%\usepackage{moreverb} %source code listing dependency
+%\usepackage{textcomp} %source code listing dependency
+%\usepackage{listings} %source code listing dependency
+\usepackage{color}    %source code listing dependency
+\usepackage{titling}  %pdf metadata dependency
+\usepackage{ifpdf}    %pdf metadata dependency
+%\usepackage{graphicx}
+%\usepackage{caption}
+%\usepackage{pstricks}
+
+%% DOCUMENT METADATA %%
+
+\title{A probabilistic integration test harness}
+\author{Jochen Weile, M.Sc.}
+\date{\today}
+
+%% LAYOUT OPTIONS %%
+\setlength{\parindent}{0ex}
+\setlength{\parskip}{1ex}
+
+%% CONFIGURE CODE HIGHLIGHTING %%
+%\lstset{
+%	tabsize=4,
+%	language=Java,
+%  basicstyle=\footnotesize,
+%  upquote=true,
+%  aboveskip={1.5\baselineskip},
+%  columns=fixed,
+%  showstringspaces=false,
+%  extendedchars=true,
+%  breaklines=true,
+%  prebreak = \raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}},
+%  frame=none,
+%  showtabs=false,
+%  showspaces=false,
+%  showstringspaces=false,
+%  identifierstyle=\ttfamily,
+%  keywordstyle=\bf\color[rgb]{0.5,0,0.7},
+%  commentstyle=\color[rgb]{0.5,0.5,0.5},
+%  stringstyle=\color[rgb]{0,0,1},
+%}
+
+%% SUPPORT FOR PDF METADATA %%
+\ifpdf
+	\pdfinfo {
+		/Author (\theauthor)
+		/Title (\thetitle)
+		/CreationDate (D:20110216120000)
+	}
+\fi
+
+%% DEFINE MACROS %%
+%\newcommand{\prob}{\mathbb{P}}
+%\newcommand{\odds}{\mathbb{O}}
+%\newcommand{\likeli}{\mathcal{L}}
+%\newcommand{\model}{\mathcal{H}}
+%\newcommand{\p}{\text{p}}
+%\newcommand{\expect}{\mathbb{E}}
+%\newcommand{\pardiff}[1]{\frac{\partial}{\partial #1}}
+\newcommand{\remark}[1]{\begin{center}\fcolorbox{black}{yellow}{\parbox{.8\textwidth}{#1}}\end{center}}
+
+%% DEFINE ENVIRONMENTS %%
+%\newtheorem{theorem}{Theorem}
+%\newtheorem{definition}{Definition}
+
+
+\begin{document}
+
+\maketitle
+
+\section{Requirements}
+\subsection{Workflow model}
+
+We aim at providing a software solution for testing the qualities of network integration algorithms. To this end we propose a simple workflow model. Each workflow cycle begins with the generation of a random graph which is assumed as the true background network. From this true model we derive experimental measurements, which serve as input for the integration algorithm to be tested. The integrated network computed by the integration method is then compared to the original true network. 
+
+In order to establish the average behaviour of the integration method it would be desirable to perform not only one but many workflow cycles and then determine the mean and variance over the results. Furthermore we would like to examine algorithms given varying parameters, so the workflow model should allow for the iteration over variable parameters. However, performing a large number of workflow cycles while varying over multiple parameters can result in significantly long runtime when performed in serial, especially if the integration method itself is computationally expensive. Thus, support for parallelization is necessary.
+
+\subsection{Extensibility}
+
+For almost all steps of a workflow cycle, many different applications are possible. There are different classes of graphs which are possible as true background graphs, such as random graphs or scale-free graphs as well as different algorithms for generating them. Similarly, for the experiment simulation and result evaluation steps there are different solutions imaginable, all of which have different advantages and dis-advantages. Finally, there are many different integration methods one may want to test. To keep the test harness open to new ideas regarding these components it would be useful to employ a plug-in architecture. New components can then be implemented as plug-ins and deployed without the need of adapting the core system. 
+
+\subsection{Random number generation}
+
+A substantial part of the test harness will depend on random number generation, such as the graph populators, the experiment simulation and some of the integration methods (most importantly the MCMC method). In order to minimize potential side effects like correlation between the the numbers generated in the different components, we will require a centralized random engine which can be accessed queried from all components. Since multiple workflow cycles may be performed in parallel, this random engine needs to be thread-safe, while at the same time not introducing a bottleneck to the parallelization. 
+
+\section{Implementation}
+
+\subsection{Input}
+
+Since the input for the test harness consists of a complicated test protocol containing descriptions of the different steps of the workflow plus the definitions of potential parameter variables, we decided to use custom XML documents to convey this input. We specified an XML schema definition which governs the syntax of these documents. A description of the input format can be found on the documentation page\footnote{http://bio-nexus.ncl.ac.uk/projects/harness}. Here, we will give a short overview of the contents of a typical input XML file.%TODO: write xml description on site
+
+The first important section of the input protocol are variable definitions. Each variable has an id, a type and a range definition. The ids are used to establish a way of referencing a variable later on in the workflow. At the time this document is written, there are two types of variables: (i) incremental variables, which require a start value, end value and skip size in their range definition, and (ii) exponential variables, which require a start value, an exponent and a number of iterations as their range definition.
+
+The next section of the protocol defines which graph implementation to use. The Harness core package only comes with one graph implementation: the map graph. Details about the map graph are given in section \ref{graph model}. However, Harness offers an open graph API, so users can implement and use their own graph models. The XML format also allows custom parameters to be passed to graph implementations. These properties can either be hard-coded values or references to the variables defined in the previous section.
+
+Another section in the protocol is used to define which graph population model to use when simulating true biological graphs. The Harness only contains one population model: The scale-free population model (See section \ref{graph population}). Other population models can be implemented and applied using the Harness API. Custom parameters can also be passed to graph models. For example, the scale-free graph model requires a number of seed nodes and a size parameter.
+
+The final section in the protocol is the description of the integration process. It determines which integration method will be tested by the harness and how many times the workflow should be executed. New integration methods in addition to the ones already contained in the Harness core package can be implemented and deployed using the API. The integration description also contains two sub-sections, describing the simulation of Gold Standards and experiments. Both are used in the same way. First, the experiment type is given. As with other plug-ins experiment types can also be implemented against the Harness API. Then, the number of experiments is given. And finally, custom properties can be passed to the experiment simulation. For example, the `simple experiment' simulation requires sensitivity and specificity parameters. These parameters, as well as the number of replicas can be hard-coded values or references to variables.
+
+
+\subsection{Workflow}
+
+The workflow controller iterates over all possible combinations of variables defined in the protocol. In each iteration the controller will execute the pre-determined number of workflow replicas in a concurrent fashion. That is, multiple workflow instances will be run simultaneously, the number of which is defined by the user and is optimally chosen to match the number of available CPU cores. 
+
+Each of the workflow threads will begin instanciating and populating a new graph, which will serve as the simulated `true' graph. This graph will then be passed to the appropriate number of experiment simulations. The resulting simulated evidental graphs will then be given to the integration method in question. Finally, the integration method's output will be compared to the original `true' graph and the results are reported back to the workflow controller, which writes them to the output file.
+
+
+\subsection{Graph model}
+\label{graph model}
+The standard graph model used in the Harness is the map graph, which uses hash maps to store the graph's topology. This way of representing graphs is usually the most memory-efficient, when applied to sparse graphs with less then 8\% of possible edges. Molecular biological networks fall into this category due to their scale-free topology.
+
+
+\subsection{Graph population}
+\label{graph population}
+
+The standard graph population model used in the Harness is the preferential attachment model for scale-free graphs. The preferential attachment algorithm begins with number of fully connected seed nodes. In each following iteration, the algorithm adds a new node to the graph and connects this node to another random pre-existig node. Here, the probability of a node to be chosen for a new connection is directly proportional to its degree.
+
+%TODO: Pseudocode?
+
+\section{Experiment simulation}
+
+%TODO: fast experiment + pseudocode
+
+\section{Integration algorithms}
+
+\subsection{Evaluation methods}
+
+
+\end{document}

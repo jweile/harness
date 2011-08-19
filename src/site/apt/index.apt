@@ -1,0 +1,9 @@
+
+Introduction
+~~~~~~~~~~~~
+
+  Harness is part is an evaluation tool for probabilistic integration algorithms on networks. It simulates molecular biological networks and their experimental measurements, which are then offered to the algorithm in question. The algorithm's results are then evaluated. Harness can perform a large number of testing procedures in parallel in order to examine the average behaviour of algorithms.
+
+  * {{{./implementation.html}How does it work?}}
+
+  * {{{./usage.html}How do I use it?}}

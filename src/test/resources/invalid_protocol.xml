@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<protocol xmlns="http://cs.ncl.ac.uk/harness/protocol"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://cs.ncl.ac.uk/harness/protocol harness.xsd">
+
+    <variables>
+        <variable type="increment" id="replEv">
+            <min value="3"/>
+            <max value="5"/>
+            <increment value="1"/>
+        </variable>
+    </variables>
+
+    <graphImplementation type="mapgraph"/>
+
+    <graphPopulation type="scalefree">
+        <properties>
+            <property key="seed" type="xsd:integer" value="3"/>
+            <property key="numNodes" type="xsd:integer" value="500"/>
+        </properties>
+    </graphPopulation>
+
+    <integration type="lycett">
+        <goldStandards>
+            <experiment type="simpleexperiment">
+                <replicas value="2"/>
+                <properties>
+                    <property key="sensitivity" type="xsd:double" value="0.9"/>
+                    <property key="specificity" type="xsd:double" value="0.9"/>
+                </properties>
+            </experiment>
+        </goldStandards>
+        <evidentialGraphs>
+            <experiment type="simpleexperiment">
+                <replicas var-ref="replEv"/>
+                <properties>
+                    <property key="sensitivity" type="xsd:double" value="0.9"/>
+                    <property key="specificity" type="xsd:double" value="0.9"/>
+                </properties>
+            </experiment>
+        </evidentialGraphs>
+    </integration>
+
+</protocol>
