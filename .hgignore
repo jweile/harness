@@ -1,0 +1,16 @@
+syntax:glob
+.svn
+.hgsvn
+.DS_Store
+.DS_Store*
+.settings
+.classpath
+.project
+.pom.xml.swp
+nbbuild.xml
+*.iml
+*.ipr
+*.iws
+*.tex.properties.xml
+target
+*.class
