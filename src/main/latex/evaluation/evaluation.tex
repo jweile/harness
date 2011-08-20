@@ -13,6 +13,7 @@
 %\usepackage{graphicx}
 %\usepackage{caption}
 %\usepackage{pstricks}
+\usepackage{forloop}
 
 %% DOCUMENT METADATA %%
 
@@ -122,6 +123,8 @@ The standard graph model used in the Harness is the map graph, which uses hash m
 The standard graph population model used in the Harness is the preferential attachment model for scale-free graphs. The preferential attachment algorithm begins with number of fully connected seed nodes. In each following iteration, the algorithm adds a new node to the graph and connects this node to another random pre-existig node. Here, the probability of a node to be chosen for a new connection is directly proportional to its degree.
 
 %TODO: Pseudocode?
+
+\fbox{\parbox{\textwidth}{\scriptsize \input{pc_prefAttachment.tex}}}
 
 \section{Experiment simulation}
 

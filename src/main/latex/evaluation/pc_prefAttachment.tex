@@ -1,0 +1,53 @@
+%%%%%%%%%%
+% MACROS %
+%%%%%%%%%%
+
+%Automatically count line numbers and adjust indentation
+\newcounter{indentDepth}
+\newcounter{indentI}
+\newcommand{\pcIndent}{\forloop{indentI}{0}{\value{indentI} < \value{indentDepth}}{\ \ }}
+\newcommand{\pcIncIndent}{\stepcounter{indentDepth}}
+\newcommand{\pcDecIndent}{\addtocounter{indentDepth}{-1}}
+\newcounter{pcLine}
+\newcommand{\pc}{\stepcounter{pcLine} \arabic{pcLine}\ \pcIndent}
+
+%Whitespace for within formulas
+\newcommand{\tab}{\text{\ }}
+
+%%%%%%%%%%%%
+% CONTENTS %
+%%%%%%%%%%%%
+{\tt %set font to monospace
+
+Input: $G = (V,E)$ where $V = \emptyset$, $E = \emptyset$\\
+\rule{\textwidth}{0.02cm}\\
+\pc $\forall \; 1 \leq i \leq n $\{\\
+\pcIncIndent
+\pc $V \leftarrow V \cup v_i$\\
+\pc $\forall \; u \in (V \setminus v_i)$\{\\
+\pcIncIndent
+\pc $E \leftarrow E \cup (u,v_i)$\\
+\pcDecIndent
+\pc \}\\
+\pcDecIndent
+\pc \}\\
+\pc $\forall \; 1 \leq i \leq n $\{\\
+\pcIncIndent
+\pc $r \sim \mathcal{U}_{[1,2|V|]}$\\
+\pc $b \leftarrow 0$\\
+\pc $\forall u \in V$\{\\
+\pcIncIndent
+\pc $b \leftarrow b + degree(u)$\\
+\pc if $b > r$\{\\
+\pcIncIndent
+\pc $V \leftarrow V \cup v_{|V|+1}$\\
+\pc $E \leftarrow E \cup (u,v_{|V|+1})$\\
+\pc break\\
+\pcDecIndent
+\pc \}\\
+\pcDecIndent
+\pc \}\\
+\pcDecIndent
+\pc \}\\
+
+}
