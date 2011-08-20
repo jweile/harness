@@ -183,7 +183,6 @@ The simulated true graph is created as a scale-free graph using a preferential a
 The next step consists of the simulation of experimental measurements on the true graph. This is the most crucial step of the artificial testing environment as it is responsible for replicating all the different faults and problems of real data. The simplest type of error occurring in experimental measurements is random noise. This type of error is easily simulated by randomly inserting edges that do not exist in the real data and removing edges that do exist in the real data until the desired error rates are reached. The next problem is systematic error or experimental bias. This phenomenon in particular leads to the violation of stochastic independence between datasets. 
 \note{TODO: Bias simulation has yet to be implemented.}%TODO <-- 
 Finally, another type of error that easily escapes one's attention is the lack of negative records. Most experiments do not report which pairs of nodes do not possess an edge. As a consequence, it is hard to differentiate between node pairs that have been observed not to interact and node pairs that have not been subject to testing. 
-\note{TODO: Low-throughput experiments have yet to be implemented}%TODO <--
 
 After the simulated evidential graphs have been given to the integration method in question the resulting integrated network is evaluated against the original graph. There are a number of different quality measures that can be applied. One important aspect is to measure the accuracy of the method in estimating the error rates in the individual experiments. We can define the quadratic loss for the error estimates as follows:
 \begin{equation}
@@ -197,8 +196,6 @@ Also, to measure the accuracy of the final edge probabilities produced by the me
 	L^{(+)} &= \frac{1}{|E_G|}\sum_{e \in E_G} (1 - \prob(e \in E_G|X))^2\\
 	L^{(-)} &= \frac{1}{|\binom{V}{2} \setminus E_G|}\sum_{e \in \binom{V}{2} \setminus E_G} \prob(e \in E_G|X)^2
 \end{align}.
-Other performance metrics such as the area under ROC curves or weighted sums over the quadratic loss functions above are also possible to apply. However we find that the separate loss functions shown above give a more detailed picture of a method's behaviour.
-\note{Maybe move to discussion. Discuss other possible scoring functions, e.g. weighted sums over FPs and FNs}
 
 We have evaluated the new algorithm in comparison with two gold standard-based methods presented by Lee and colleagues \citep{lee_probabilistic_2004} and James and colleagues \REF. For our evaluation we have examined the following scenario: Each integration method is given the task of processing a number (3,5,7,9,11) of high-throughput (HTP) experiments with average false negative rate $0.15$ and average false discovery rate of $0.15$ (corresponds to false positive rate of 0.0006). In the case of the gold standard-based methods, one of the input experiments serves as the gold standard.
 
@@ -210,7 +207,15 @@ In addition to the evaluation on artificial data it is important to analyse the 
 
 \section{Results}
 
-Figure \ref{htp} shows the methods' performances over different numbers of input HTP experiments. It is clearly visible that the new fully Bayesian method outperforms both gold standard-based methods, particularly given a low number of input datasets.
+Figure \ref{htp} shows the methods' performances over different numbers of input HTP experiments. It is clearly visible that the new fully Bayesian method overall outperforms both gold standard-based methods. For low numbers of input datasets, the loss over existing interactions is significantly lower. Given more than five HTP experiments, all methods show comparably low loss of existing interactions. 
+
+Regarding non-existing interactions the fully Bayesian method constantly performs better than the method presented by James and colleagues. \note{See if we can get rid of Lee's strange behaviour here, by using a different threshold.}
+
+The average loss regarding the $\theta$ estimates shows the fully Bayesian method's superior precision, which increases with the number of input experiments, while both gold standard-based methods stagnate at constant large amout of loss.
+
+\note{TODO: re-run on biased data}
+
+\note{TODO: Show some stats on the integration of real data}
 
 \begin{figure}[!tpb]
 \centerline{\includegraphics[width=.5\textwidth]{fig1.pdf}}
@@ -218,9 +223,13 @@ Figure \ref{htp} shows the methods' performances over different numbers of input
 \label{htp}
 \end{figure}
 
-When given a mixed set of HTP and LTP experiments, ...\note{TODO: Implement LTP simulation}
+%When given a mixed set of HTP and LTP experiments, ...\note{TODO: Implement LTP simulation}
 
 \section{Discussion}
+
+
+%In addition to the performance metrics used here, others such as the area under ROC curves or weighted sums over the quadratic loss functions above are also possible to apply. However we find that the separate loss functions shown above give a more detailed picture of a method's behaviour.
+%\note{Discuss other possible scoring functions, e.g. weighted sums over FPs and FNs}
 
 \note{TODO: Write discussion}
 
