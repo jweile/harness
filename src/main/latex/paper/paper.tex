@@ -116,40 +116,52 @@ To overcome this problem, a fully Bayesian approach was employed to generate sam
 
 %The vector of error rates associated with the members of the vector of experimental networks $X$, is denoted as $\theta = \{ (\alpha_1,\beta_1), \ldots , (\alpha_n,\beta_n) \}$, where $\alpha_i$ is the false positive rate of $X_i$ and $\beta_i$ is the false negative rate of $X_i$.
 
+To determine the joint posterior distribution $\pi(\theta,G|X)$,  one may exploit the following equation:
+
+\begin{equation} 
+	 \pi(\theta,G|X) = \frac{\pi(\theta,G,X)}{\prob(X)} 
+\end{equation}.
+
+Thus, the posterior distribution $\pi(\theta,G|X)$ is proportional to the joint distribution $\pi(\theta,G,X)$. The joint distribution may in turn be determined as follows.
+
+\begin{equation} 
+	 \pi(\theta,G,X) = \pi(G)\cdot\pi(\theta)\cdot\prob(X|\theta,G)
+\end{equation}
+
+In summary, the following statement can be made. 
+
+\begin{equation} 
+	 \pi(\theta,G|X) \propto \pi(G)\cdot\pi(\theta)\cdot\prob(X|\theta,G) 
+\end{equation}
+
+As a consequence, three values need to be determined: the prior distribution $\pi(G)$, the prior distribution $\pi(\theta)$ and the likelihood $\prob(X|\theta,G)$.
+
+We define the prior distribution of $\pi(G)$ based on the prior probability of each single edge to exist:
+\begin{align}
+  \pi(G) &= \prod_{e \in \binom{V}{2}} \pi(G_e)\\
+         &= (1-q)^{\left |\binom{V}{2}\setminus E_G \right |} \cdot q^{|E_G|}
+\end{align},
+where $q$ is the prior probability of an edge to really exist. \note{Not sure we really need this, since we don't use it afterwards anywhere.}
+
+To determine the prior distribution $\pi(\theta)$, we have to consider the nature of the error rates $\alpha_i$ and $\beta_i$ as ``success rates'' for misreading each potential edge. Modelling each observation event over a potential edge as a Bernoulli experiment with such a success rate, the number of false positives and false negatives in an experimental graph $X_i$ would follow a binomial distribution. The success rates for a binomial distribution can be sampled using the Beta distribution. The Beta distribution is dependent on two parameters, $a$ and $b$. 
+
 However, instead of sampling from $\pi(\theta,G|X)$ directly, we employ Gibbs sampling \citep{gelfand_sampling-based_1990} and alternately sample from $\pi(\theta|G,X)$ and $\pi(G|\theta,X)$.
 
 The algorithm proceeds in cycles. At the beginning of each new cycle, a potential true graph $G$ needs to be sampled based on the error rate vector $\theta$. The sampling is accomplished by using the Bayesian method discussed above to infer posterior existence probabilities for each edge. These probabilities can then be used to sample a potential $G$ by lookup. That is, for each potential edge, a $\mathcal{U}_{[0,1]}$ random number is sampled. If that random number is smaller than the posterior existence probability of that edge, $G$ will contain the edge. Otherwise $G$ will not contain the edge.
 
-The second step in each cycle is the sampling of a new error rate vector $\theta$ based on $G$. The error rates $\alpha_i$ and $\beta_i$ behave like the success rates for misreading each potential edge. Modelling each observation event over a potential edge as a Bernoulli experiment with such a success rate, the number of false positives and false negatives in an experimental graph $X_i$ would follow a binomial distribution. The success rates for a binomial distribution can be sampled using the Beta distribution. The Beta distribution takes two parameters, $a$ and $b$. The parameters $a$ and $b$ can be interpreted as one plus the number of successes and failures, respectively, in a binomial distributed dataset. In order to obtain values for $a$ and $b$, one can compare each $X_i$ to the currently assumed true graph $G$ and use it to count the number of supposed True Positives (tp), False Positives (fp), True Negatives (tn) and False Negatives (fn). Then, the full conditionals for $\alpha$ and $\beta$ can be sampled as follows:
+The second step in each cycle is the sampling of a new error rate vector $\theta$ based on $G$. 
+%FIXME
+The parameters $a$ and $b$ can be interpreted as one plus the number of successes and failures, respectively, in a binomial distributed dataset. In order to obtain values for $a$ and $b$, one can compare each $X_i$ to the currently assumed true graph $G$ and use it to count the number of supposed True Positives (tp), False Positives (fp), True Negatives (tn) and False Negatives (fn). Then, the full conditionals for $\alpha$ and $\beta$ can be sampled as follows:
 \begin{align}
   \alpha_i &\sim Be(\text{fp}_i+1, \text{tn}_i+1)\\
   \beta_i &\sim Be(\text{fn}_i+1, \text{tp}_i+1)
-\end{align}
+\end{align}.
 
 To initiate the algorithm as a whole, we need to generate initial error rate vector $\theta_{\text{init}}$. It is sufficient to sample the initial values for each $\alpha_i$ and $\beta_i$ from their prior distribution.
 %$Be(1,1)$, which is equivalent to the uniform distribution $\mathcal{U}_{[0,1]}$. 
 Pseudocode for the complete algorithm is given in the supplementary material.
 
 %Finally, a score analogous to the likelihood of the current state can be computed as $\pi(\theta,G|X)$.
-%Lacking a way to determine this value directly, one may exploit the following equation. 
-
-%\begin{equation} 
-%	 \pi(\theta,G|X) = \frac{\pi(\theta,G,X)}{\prob(X)} 
-%\end{equation}
-
-%Thus, the posterior distribution $\pi(\theta,G|X)$ is proportional to the joint distribution $\pi(\theta,G,X)$. The joint distribution may in turn be determined as follows.
-
-%\begin{equation} 
-%	 \pi(\theta,G,X) = \pi(G)\cdot\pi(\theta)\cdot\prob(X|\theta,G)
-%\end{equation}
-
-%In summary, the following statement can be made. 
-
-%\begin{equation} 
-%	 \pi(\theta,G|X) \propto \pi(G)\cdot\pi(\theta)\cdot\prob(X|\theta,G) 
-%\end{equation}
-
-%As a consequence, three values need to be determined: the prior distribution $\pi(G)$, the prior distribution $\pi(\theta)$ and the likelihood $\prob(X|\theta,G)$.
 
 
 \subsection{Evaluation method}
@@ -216,5 +228,7 @@ When given a mixed set of HTP and LTP experiments, ...\note{TODO: Implement LTP 
 \bibliographystyle{natbib}
 
 \bibliography{paper}
+
+\note{TODO: Fix capitalization and italics in BibTeX file}
 
 \end{document}
