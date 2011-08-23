@@ -1,6 +1,6 @@
 #!/usr/bin/Rscript
 
-pdf("plot.pdf",width=4,height=8)
+pdf("fig1.pdf",width=4,height=8)
 op=par(mfrow=c(3,1))
 
 fn <- read.table("fn.tsv",header=TRUE,row.names=1,sep="\t")
@@ -18,8 +18,12 @@ barplot(as.matrix(t(er)),beside=TRUE,xlab="# experiments",ylab=expression(E(L["E
 par(op)
 dev.off()
 
-pdf("plot.pdf",width=4,height=4)
-probs = read.csv("probabilities.csv")
-hist(probs[,1],main="",xlab="Edge probability")
+pdf("fig2.pdf",width=6,height=12)
+op=par(mfrow=c(2,1))
+probsppi = read.csv("probabilities_ppi.csv")
+hist(probsppi[,1],main="",xlab="PPI probability")
+probsgi = read.csv("probabilities_gi.csv")
+hist(probsgi[,1],main="",xlab="GI probability")
+par(op)
 dev.off()
 
