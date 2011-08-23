@@ -18,3 +18,8 @@ barplot(as.matrix(t(er)),beside=TRUE,xlab="# experiments",ylab=expression(E(L["E
 par(op)
 dev.off()
 
+pdf("plot.pdf",width=4,height=4)
+probs = read.csv("probabilities.csv")
+hist(probs[,1],main="",xlab="Edge probability")
+dev.off()
+
