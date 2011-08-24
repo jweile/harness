@@ -207,6 +207,8 @@ In addition to the evaluation on artificial data it is important to analyse the 
 
 \section{Results}
 
+\subsection{Evaluation on simulated data}
+
 Figure \ref{htp} shows the methods' performances over different numbers of input HTP experiments. It is clearly visible that the new fully Bayesian method overall outperforms both gold standard-based methods. For low numbers of input datasets, the loss over existing interactions is significantly lower. Given more than five HTP experiments, all methods show comparably low loss of existing interactions. 
 
 Regarding non-existing interactions the fully Bayesian method constantly performs better than the method presented by James and colleagues. \note{See if we can get rid of Lee's strange behaviour here, by using a different threshold.}
@@ -215,8 +217,6 @@ The average loss regarding the $\theta$ estimates shows the fully Bayesian metho
 
 \note{TODO: re-run on biased data}
 
-\note{TODO: Show some stats on the integration of real data}
-
 \begin{figure}[!tpb]
 \centerline{\includegraphics[width=.5\textwidth]{fig1.pdf}}
 \caption{Evaluation of the algorithm in comparison with GS-based methods by Lee and colleagues and James and colleagues given different numbers of HTP experiments. Top: Average loss over interacting node pairs ($L^{(+)}$). Centre: Average loss over non-interacting node pairs ($L^{(-)}$). Bottom: Average loss over regarding error rate estimates ($L_\text{ER}$).}
@@ -224,10 +224,15 @@ The average loss regarding the $\theta$ estimates shows the fully Bayesian metho
 \end{figure}
 
 
+\subsection{Application to physical and genetic interactions}
+
+Figure \ref{ppi+gi} shows histograms of the existence probabilities for physical and genetic interactions from the semantically integrated dataset as calculated by the method presented here. It is apparent that \note{NUMBER}\% of the experimentally reported protein-protein interactions have been assigned probabilites less than 0.1. This is consistent with the reports of \note{PAPER}.
+
+
 \begin{figure}[!tpb]
 \centerline{\includegraphics[width=.5\textwidth]{fig2.pdf}}
-\caption{Histogram of existence probabilities for the interactions in the integrated PPI/GI dataset.}
-\label{htp}
+\caption{Histogram of existence probabilities for the interactions in the integrated dataset. Top: Protein-protein interactions, bottom: genetic interactions.}
+\label{ppi+gi}
 \end{figure}
 
 %When given a mixed set of HTP and LTP experiments, ...\note{TODO: Implement LTP simulation}
