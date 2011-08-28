@@ -90,15 +90,18 @@ public class BiasedExperimentTest extends TestCase {
         Logger.getLogger(this.getClass().getName())
                 .log(Level.INFO, "Sensitivity discrepancy: {0} -> {1}",
                      new Object[]{sens, actualSens});
+        System.out.println("Sensitivity discrepancy: "+sens+" -> "+actualSens);
 
         Logger.getLogger(this.getClass().getName())
-                .log(Level.INFO, "FPR discrepancy: {0} -> {1}",
+                .log(Level.INFO, "FDR discrepancy: {0} -> {1}",
                      new Object[]{fdr, actualFdr});
+        System.out.println("FDR discrepancy: "+fdr+" -> "+actualFdr);
 
 
         Logger.getLogger(this.getClass().getName())
                 .log(Level.INFO, "Experimental edges: {0}",
                      experimentalGraph.getNumEdges());
+        System.out.println("Experimental edges: "+experimentalGraph.getNumEdges());
     }
 
      /**
