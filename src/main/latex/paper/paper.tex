@@ -106,6 +106,8 @@ That is, the odds of the edge to exist given all the experimental measurements i
 
 As mentioned above, the calculation assumes that experimental measurements are stochastically independent. This assumption is not valid for real data, and thus introduces a potential source of error into the methodology. Lee and colleagues address this problem by introducing dependency co-efficients for their datasets, a solution which relies heavily on guesswork \citep{lee_probabilistic_2004}. Instead we focus on making our method robust towards this kind of error. 
 
+\note{TODO: Discuss value of prior odds}
+
 In order to calculate the Bayes factors above it is necessary to determine the rates of false positives and false negatives in each dataset. One approach is to compare each dataset to a gold standard and count the number of differences. However, due to previously discussed lack of gold standards, this approach is not feasible here. Therefore, the only available option is to evaluate the datasets against one another in the form of a common consensus. 
 
 A naive approach is to start with random values for the error rates, and to use them to create a candidate integrated network. Updated parameter values and the resulting integrated networks can then be iteratively computed. However, a series of networks produced by this method does not typically converge to any sensible result (data not shown).
@@ -180,9 +182,8 @@ The simulated experimental datasets are subsequently passed to the integration m
 The simulated true graph is created as a scale-free graph using a preferential attachment algorithm, since most molecular-biological graphs have been shown to be approximately scale-free \citep{jeong_lethality_2001, eisenberg_preferential_2003}. A description of the algorithm can be found in the supplementary material.
 \note{Mention how this does not match the algorithm's definition of the prior distribution of $G$, thus making it more challenging for the algorithm to perform.}%TODO
 
-The next step consists of the simulation of experimental measurements on the true graph. This is the most crucial step of the artificial testing environment as it is responsible for replicating all the different faults and problems of real data. The simplest type of error occurring in experimental measurements is random noise. This type of error is easily simulated by randomly inserting edges that do not exist in the real data and removing edges that do exist in the real data until the desired error rates are reached. The next problem is systematic error or experimental bias. This phenomenon in particular leads to the violation of stochastic independence between datasets. 
-\note{TODO: Bias simulation has yet to be implemented.}%TODO <-- 
-Finally, another type of error that easily escapes one's attention is the lack of negative records. Most experiments do not report which pairs of nodes do not possess an edge. As a consequence, it is hard to differentiate between node pairs that have been observed not to interact and node pairs that have not been subject to testing. 
+The next step consists of the simulation of experimental measurements on the true graph. This is the most crucial step of the artificial testing environment as it is responsible for replicating all the different faults and problems of real data. The simplest type of error occurring in experimental measurements is random noise. This type of error is easily simulated by randomly inserting edges that do not exist in the real data and removing edges that do exist in the real data until the desired error rates are reached. The next problem is systematic error, also known as experimental bias. This phenomenon in particular leads to the violation of stochastic independence between datasets. We simulate this by sampling separate false negative probabilities for each interaction and false positive probabilities for each non-interacting node-pair from Beta distributions. We then use these prepared probilities to generate false positives and false negatives in the experiments, thus introducing the same bias/systematic error. Pseudocode for this method is provided in the supplementary material.
+Finally, another type of problem that easily escapes one's attention is the lack of negative records. Most experiments do not report which pairs of nodes do not possess an edge. As a consequence, it is hard to differentiate between node pairs that have been observed not to interact and node pairs that have not been subject to testing. 
 
 After the simulated evidential graphs have been given to the integration method in question the resulting integrated network is evaluated against the original graph. There are a number of different quality measures that can be applied. One important aspect is to measure the accuracy of the method in estimating the error rates in the individual experiments. We can define the quadratic loss for the error estimates as follows:
 \begin{equation}
@@ -215,8 +216,6 @@ Regarding non-existing interactions the fully Bayesian method constantly perform
 
 The average loss regarding the $\theta$ estimates shows the fully Bayesian method's superior precision, which increases with the number of input experiments, while both gold standard-based methods stagnate at constant large amout of loss.
 
-\note{TODO: re-run on biased data}
-
 \begin{figure}[!tpb]
 \centerline{\includegraphics[width=.5\textwidth]{fig1.pdf}}
 \caption{Evaluation of the algorithm in comparison with GS-based methods by Lee and colleagues and James and colleagues given different numbers of HTP experiments. Top: Average loss over interacting node pairs ($L^{(+)}$). Centre: Average loss over non-interacting node pairs ($L^{(-)}$). Bottom: Average loss over regarding error rate estimates ($L_\text{ER}$).}
@@ -226,7 +225,7 @@ The average loss regarding the $\theta$ estimates shows the fully Bayesian metho
 
 \subsection{Application to physical and genetic interactions}
 
-Figure \ref{ppi+gi} shows histograms of the existence probabilities for physical and genetic interactions from the semantically integrated dataset as calculated by the method presented here. It is apparent that \note{NUMBER}\% of the experimentally reported protein-protein interactions have been assigned probabilites less than 0.1. This is consistent with the reports of \note{PAPER}.
+Figure \ref{ppi+gi} shows histograms of the existence probabilities for physical and genetic interactions from the semantically integrated dataset as calculated by the method presented here. A share of 39.03\% of the experimentally reported protein-protein interactions have been assigned probabilites less than 0.1. This percentage is lower than what could be expected according to the projections of Hart and colleagues \citep{hart_how_2006}.
 
 
 \begin{figure}[!tpb]
@@ -238,12 +237,22 @@ Figure \ref{ppi+gi} shows histograms of the existence probabilities for physical
 %When given a mixed set of HTP and LTP experiments, ...\note{TODO: Implement LTP simulation}
 
 \section{Discussion}
-
+\note{
+\begin{itemize}
+  \item Excellent performance despite giving competitors head start with unbiased gold standards and accurate fudge factors, which wouldn't be available normally.
+  \item Other possible performance metrics (e.g. ROC curves or weighted sums)
+  \item Discuss discrepancy between Hart et al and the PPI network
+  \item Future work: Evaluate on simulated low-throughput
+  \item Future work: Further evaluation of the algorithm using the integrated dataset
+  \begin{itemize}
+    \item Measure functional annotation accuracy with leave-one-out
+  \end{itemize}
+\end{itemize}
+}
 
 %In addition to the performance metrics used here, others such as the area under ROC curves or weighted sums over the quadratic loss functions above are also possible to apply. However we find that the separate loss functions shown above give a more detailed picture of a method's behaviour.
 %\note{Discuss other possible scoring functions, e.g. weighted sums over FPs and FNs}
 
-\note{TODO: Write discussion}
 
 \section*{Acknowledgements}
 
