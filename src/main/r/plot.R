@@ -18,7 +18,7 @@ barplot(as.matrix(t(er)),beside=TRUE,xlab="# experiments",ylab=expression(E(L["E
 par(op)
 dev.off()
 
-pdf("fig2.pdf",width=6,height=9)
+pdf("fig2.pdf",width=6,height=8)
 op=par(mfrow=c(2,1))
 probsppi = read.csv("probabilities_ppi.csv")
 hist(probsppi[,1],main="",xlab="PPI probability",col="gray")
