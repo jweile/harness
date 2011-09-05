@@ -67,7 +67,7 @@ An alternative paradigm is semantic data integration \citep{cheung_yeasthub:_200
 An important question in data integration is how to assess the degree of confidence in each statement, that is, how likely the statement is to be correct. Several popular solutions to this problem exist in the context of functional networks \citep{lee_probabilistic_2004,troyanskaya_bayesian_2003}.
 These methods assess the quality of each input dataset against one or more additional datasets of higher quality, usually manually-curated collections. Based on the confidence measures gained from this comparison it is then possible to calculate a confidence measure for each functional interaction. The high-quality datasets used in these comparisons are often referred to as `gold standards'. 
 
-Inferring confidence assessments for semantically integrated datasets is challenging, because each single type of association must be scored separately. However, gold standards only exist for some types of associations. Therefore, it is desirable to find a method that can infer confidence measures on biological networks in the absence of a gold standard, that is, based only on the existing experimental data. So far, only partial solutions to this problem exist. These solutions infer confidence measures for a specific type of association only, for example, protein-protein interactions \citep{bader_gaining_2004}.\note{Find more}
+Inferring confidence assessments for semantically integrated datasets is challenging, because each single type of association must be scored separately. However, gold standards only exist for some types of associations. Therefore, it is desirable to find a method that can infer confidence measures on biological networks, preferrably in the absence of a gold standard, that is, based only on the existing experimental data. So far, only partial solutions to this problem exist. These solutions infer confidence measures for a specific type of association only, for example, protein-protein interactions \citep{bader_gaining_2004,braun_experimentally_2009,venkatesan_empirical_2009}.
 
 %Whether or not this description is justified is a matter of dispute \REF. 
 
@@ -180,7 +180,7 @@ In order to evaluate the method described above and to compare it against other 
 The simulated experimental datasets are subsequently passed to the integration method under investigation. The integrated graph resulting from the integration method is then compared with the original simulated true graph to evaluate the integration method's performance. Such a testing workflow can be programmed to be executed a large number of times in order to measure a method's average behaviour. Furthermore, the testing tool allows for the automatic variation of different input parameters.
 
 The simulated true graph is created as a scale-free graph using a preferential attachment algorithm, since most molecular-biological graphs have been shown to be approximately scale-free \citep{jeong_lethality_2001, eisenberg_preferential_2003}. A description of the algorithm can be found in the supplementary material.
-\note{Mention how this does not match the algorithm's definition of the prior distribution of $G$, thus making it more challenging for the algorithm to perform.}%TODO
+Not only does the choice of scale free background graphs more closely match the topology of real biological graphs; it also poses an additional challenge for the new algorithm, since such graphs break with the assumption of a uniform prior distribution for $G$.
 
 The next step consists of the simulation of experimental measurements on the true graph. This is the most crucial step of the artificial testing environment as it is responsible for replicating all the different faults and problems of real data. The simplest type of error occurring in experimental measurements is random noise. This type of error is easily simulated by randomly inserting edges that do not exist in the real data and removing edges that do exist in the real data until the desired error rates are reached. The next problem is systematic error, also known as experimental bias. This phenomenon in particular leads to the violation of stochastic independence between datasets. We simulate this by sampling separate false negative probabilities for each interaction and false positive probabilities for each non-interacting node-pair from Beta distributions. We then use these prepared probilities to generate false positives and false negatives in the experiments, thus introducing the same bias/systematic error. Pseudocode for this method is provided in the supplementary material.
 Finally, another type of problem that easily escapes one's attention is the lack of negative records. Most experiments do not report which pairs of nodes do not possess an edge. As a consequence, it is hard to differentiate between node pairs that have been observed not to interact and node pairs that have not been subject to testing. 
@@ -200,9 +200,11 @@ Also, to measure the accuracy of the final edge probabilities produced by the me
 
 We have evaluated the new algorithm in comparison with two gold standard-based methods presented by Lee and colleagues \citep{lee_probabilistic_2004} and James and colleagues \REF. For our evaluation we have examined the following scenario: Each integration method is given the task of processing a number (3,5,7,9,11) of high-throughput (HTP) experiments with average false negative rate $0.15$ and average false discovery rate of $0.15$ (corresponds to false positive rate of 0.0006). In the case of the gold standard-based methods, one of the input experiments serves as the gold standard.
 
-\subsection{Semantic integration}
+\subsection{Application to biological networks}
 
-In addition to the evaluation on artificial data it is important to analyse the method's performance on real biological data. To this end we have used the semantic data integration system Ondex \citep{koehler_graph-based_2006} to gather as much data as possible on the \species{Saccharomyces cerevisiae} protein-protein interaction (PPI) network. A new PSI-MI 2.5 XML \citep{kerrien_broadening_2007} parser was written to import data from the BioGRID \citep{breitkreutz_biogrid_2008}, MINT \citep{chatr-aryamontri_mint:_2007}, IntAct \citep{hermjakob_intact:_2004} and MIPS-MPACT \citep{guldener_mpact:_2006}. The resulting Ondex dataset represented proteins, their interactions, the experiments in which the interactions have been observed and the publications in which the experiments were described. A semantic merger method was developed to clean the dataset of its redundancies. Further details on the semantic integration procedure can be found in the supplementary material.
+In addition to the evaluation on artificial data we applied the new method to semantically integrated biological data. We used the data integration system Ondex \citep{koehler_graph-based_2006} to gather as much data as possible on the \species{Saccharomyces cerevisiae} protein-protein interaction (PPI) and genetic interaction (GI) network. W have imported all\species{S. cerevisiae} data from the BioGRID \citep{breitkreutz_biogrid_2008}, MINT \citep{chatr-aryamontri_mint:_2007}, IntAct \citep{hermjakob_intact:_2004} and MIPS-MPACT \citep{guldener_mpact:_2006} via the PSI-MI 2.5 XML \citep{kerrien_broadening_2007} format. The resulting Ondex dataset represented proteins and genetic features, as well as their interactions, the experiments in which the interactions have been observed and the publications in which the experiments were described. To identify and interlink equivalent entries we implemented a semantic merger method. Finally, we summarized small low-throughput experiments (<20 interactions) into larger groups according to their experimental type, since low sample sizes can be expected to lead to very unprecise error rate estimates. Further details on the semantic integration procedure can be found in the supplementary material.
+
+Having established a semantic knowledge network of physical and genetic interactions within \species{S. cerevisiae} We executed the new algorithm over all 51,006 contained physical interactions (PSI-MI ontology ID MI:0915) and all 15,006 contained synthetic genetic interactions (PSI-MI ontology ID MI:0794), as an exemplary type of genetic interaction.
 
 \end{methods}
 
@@ -223,25 +225,29 @@ The average loss regarding the $\theta$ estimates shows the fully Bayesian metho
 \end{figure}
 
 
-\subsection{Application to physical and genetic interactions}
+\subsection{Interaction probabilities for \species{S. cerevisiae}}
 
-Figure \ref{ppi+gi} shows histograms of the existence probabilities for physical and genetic interactions from the semantically integrated dataset as calculated by the method presented here. A share of 39.03\% of the experimentally reported protein-protein interactions have been assigned probabilites less than 0.1. This percentage is lower than what could be expected according to the projections of Hart and colleagues \citep{hart_how_2006}.
+Figure \ref{ppi+gi} shows histograms of the existence probabilities for physical interactions and synthetic genetic interactions from the semantically integrated dataset as calculated by the method presented here. Regarding physical interactions, 20,180 (39.03\%) of the experimentally reported interactions have been assigned probabilites less than 0.1. A total of 22090 (43.3\%) have been assigned probabilites greater than 0.9. The remaining interactions are widely distributed around a small peak near probability 0.3.
 
+\note{TODO: Output error rates and compare with values from \citep{dhaeseleer_estimating_2004} and \citep{hart_how_2006}} 
+
+When looking at the probability distribution over synthetic genetic interactions it is apparent that with 14,386 (95.8\%) a vast majority of interactions have been assigned values of less than 0.5. \note{Potential explanation: Extremely poor coverage. TODO: run coverage analysis in Ondex to confirm.} Of these, 8086 (53.9\%) have a probability less than 0.1. Only 230 (1.5\%) have a probability greater than 0.9.
+
+
+%\citep{hart_how_2006} summarizes literature about PPI interactome size projections as between 37,800-75,500.
 
 \begin{figure}[!tpb]
 \centerline{\includegraphics[width=.5\textwidth]{fig2.pdf}}
-\caption{Histogram of existence probabilities for the interactions in the integrated dataset. Top: Protein-protein interactions, bottom: genetic interactions.}
+\caption{Histogram of existence probabilities for the interactions in the integrated dataset. Top: Protein-protein interactions, bottom: synthetic genetic interactions.}
 \label{ppi+gi}
 \end{figure}
 
-%When given a mixed set of HTP and LTP experiments, ...\note{TODO: Implement LTP simulation}
 
 \section{Discussion}
 \note{
 \begin{itemize}
   \item Excellent performance despite giving competitors head start with unbiased gold standards and accurate fudge factors, which wouldn't be available normally.
   \item Other possible performance metrics (e.g. ROC curves or weighted sums)
-  \item Discuss discrepancy between Hart et al and the PPI network
   \item Future work: Evaluate on simulated low-throughput
   \item Future work: Further evaluation of the algorithm using the integrated dataset
   \begin{itemize}
@@ -267,6 +273,6 @@ Figure \ref{ppi+gi} shows histograms of the existence probabilities for physical
 
 \bibliography{paper}
 
-\note{TODO: Fix capitalization and italics in BibTeX file}
+\note{TODO: Fix capitalization and italics in BibTeX file (Adding items from Zotero will undo this, so wait until the end)}
 
 \end{document}
