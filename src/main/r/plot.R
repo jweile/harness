@@ -18,12 +18,12 @@ barplot(as.matrix(t(er)),beside=TRUE,xlab="# experiments",ylab=expression(E(L["E
 par(op)
 dev.off()
 
-pdf("fig2.pdf",width=6,height=12)
+pdf("fig2.pdf",width=6,height=9)
 op=par(mfrow=c(2,1))
 probsppi = read.csv("probabilities_ppi.csv")
-hist(probsppi[,1],main="",xlab="PPI probability")
+hist(probsppi[,1],main="",xlab="PPI probability",col="gray")
 probsgi = read.csv("probabilities_sl.csv")
-hist(probsgi[,1],main="",xlab="Synthetic GI probability")
+hist(probsgi[,1],main="",xlab="Synthetic GI probability",col="gray")
 par(op)
 dev.off()
 
