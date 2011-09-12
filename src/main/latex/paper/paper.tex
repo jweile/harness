@@ -7,6 +7,8 @@
 \usepackage{amssymb}
 \usepackage{natbib}
 \usepackage{color} 
+\usepackage{float}
+\usepackage{forloop}
 
 %% DEFINE MACROS %%
 %% Math macros %%
@@ -21,6 +23,10 @@
 \newcommand{\remark}[1]{\begin{center}\fcolorbox{black}{yellow}{\parbox{.8\textwidth}{#1}}\end{center}}
 \newcommand{\note}[1]{{\color{red}[#1]}}
 \newcommand{\REF}{{\color{red}[REF]}}
+%% Pseudocode macros %%
+\floatstyle{ruled}
+\newfloat{pseudocode}{thp}{lop}
+\floatname{pseudocode}{Pseudocode}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -62,7 +68,7 @@ A significant proportion of knowledge about molecular biological processes is di
 
 A popular integration paradigm is the construction of functional networks \citep{lee_probabilistic_2004,von_mering_string:_2003,james_integration_2009}. Functional networks represent different types of relationships between biological entities in an abstract manner. Associations such as genetic interactions, protein-protein interactions, gene regulation and co-expression are combined into simple abstract statements of functional relatedness, which are termed functional interactions.
 
-An alternative paradigm is semantic data integration \citep{cheung_yeasthub:_2005,smith_obo_2007,koehler_graph-based_2006}\note{Cite Pathway commons here}. These approaches aim at representing the biological information (and as much of its meaning as possible) in a computationally accessible fashion. Rather than generalizing over all types of associations between entities to infer functional interactions, each type of association is considered separately.
+An alternative paradigm is semantic data integration \citep{cheung_yeasthub:_2005,smith_obo_2007,koehler_graph-based_2006,cerami_pathway_2010}. These approaches aim at representing the biological information (and as much of its meaning as possible) in a computationally accessible fashion. Rather than generalizing over all types of associations between entities to infer functional interactions, each type of association is considered separately.
 
 An important question regarding such networks is how to assess the degree of confidence in each statement, that is, how likely the statement is to be correct. Several popular solutions to this problem exist for functional networks \citep{lee_probabilistic_2004}\note{REF Lycett when it's accepted}.
 These methods assess the quality of each input dataset against one or more additional datasets of higher quality, usually manually-curated collections. Based on the confidence measures gained from this comparison it is then possible to calculate a confidence measure for each functional interaction. The high-quality datasets used in these comparisons are often referred to as `gold standards'. 
@@ -96,17 +102,15 @@ Then, under the assumption that all measurements are independent from each other
 	\odds(L^e|D^e_{(n)}) = \Lambda_n \cdot \odds(L^e|D^e_{(n-1)})
 \end{equation}
 
-A full proof of the above equation is provided in the supplementary material. This recursive equation can be expressed iteratively as follows:
+A full proof of the above equation is provided in the supplementary methods. This recursive equation can be expressed iteratively as follows:
 
 \begin{equation} 
 	\odds(L^e|D^e_{(n)}) = \prod_{i=1}^n \Lambda_i \cdot \odds(L^e)
 \end{equation}
 
-That is, the odds of the edge to exist given all the experimental measurements is the product of the Bayes factors for these measurements with the prior odds of edge existence. These odds can be converted into the equivalent probability. 
+That is, the odds of the edge to exist given all the experimental measurements is the product of the Bayes factors for these measurements with the prior odds of edge existence. (The determination the prior odds are described in the supplementary methods.) These odds can be converted into the equivalent probability using the logistic function. 
 
-As mentioned above, the calculation assumes that experimental measurements are stochastically independent. This assumption is not valid for real data, and thus introduces a potential source of error into the methodology. Lee and colleagues address this problem by introducing dependency co-efficients for their datasets, a solution which relies heavily on guesswork \citep{lee_probabilistic_2004}. Instead we focus on making our method robust towards this kind of error. 
-
-\note{TODO: Discuss value of prior odds}
+As mentioned above, the calculation assumes that experimental measurements are stochastically independent. This assumption is not valid for real data, and thus introduces a potential source of error into the methodology. Lee and colleagues address this problem by introducing dependency co-efficients for their datasets \citep{lee_probabilistic_2004}, a solution which we argue relies on user guesswork. Instead we focus on making our method robust towards this kind of error. 
 
 In order to calculate the Bayes factors above it is necessary to determine the rates of false positives and false negatives in each dataset. One approach is to compare each dataset to a gold standard and count the number of differences. However, due to previously discussed lack of gold standards, this approach is not feasible here. Therefore, the only available option is to evaluate the datasets against one another in the form of a common consensus. 
 
@@ -168,9 +172,12 @@ The parameters $a$ and $b$ can be interpreted as one plus the number of successe
 
 To initiate the algorithm as a whole, we need to generate an initial error rate vector $\theta_{\text{init}}$. It is sufficient to sample the initial values for each $\alpha_i$ and $\beta_i$ from their prior distribution.
 %$Be(1,1)$, which is equivalent to the uniform distribution $\mathcal{U}_{[0,1]}$. 
-Pseudocode for the complete algorithm is given in the supplementary material.
+%Pseudocode for the complete algorithm is given in the supplementary methods.
 
-%Finally, a score analogous to the likelihood of the current state can be computed as $\pi(\theta,G|X)$.
+\begin{pseudocode}
+  \scriptsize \input{pseudocode.tex}
+  \caption{The Gibbs sampling algorithm for sampling from $\pi(\theta,G|X)$.}
+\end{pseudocode}
 
 
 \subsection{Evaluation method}
@@ -180,12 +187,12 @@ The simulated experimental datasets are subsequently passed to the integration m
 
 Such a testing workflow can be programmed to be executed a large number of times in order to measure a method's average behaviour. Furthermore, the testing tool allows for the automatic variation of different input parameters.
 
-The simulated true graph is created as a scale-free graph using a preferential attachment algorithm, since most molecular-biological graphs have been shown to be approximately scale-free \citep{jeong_lethality_2001, eisenberg_preferential_2003}. A description of the algorithm can be found in the supplementary material.
+The simulated true graph is created as a scale-free graph using a preferential attachment algorithm, since most molecular-biological graphs have been shown to be approximately scale-free \citep{jeong_lethality_2001, eisenberg_preferential_2003}. A description of the algorithm can be found in the supplementary methods.
 Not only does the choice of scale free background graphs more closely match the topology of real biological graphs; it also poses an additional challenge for the new algorithm, since such graphs break with the assumption of a uniform prior distribution for $G$.
 
 The next step consists of the simulation of experimental measurements on the true graph. This is the most crucial step of the artificial testing environment as it is responsible for replicating all the different faults and problems of real data. The simplest type of error occurring in experimental measurements is random noise. This type of error is easily simulated by randomly inserting edges that do not exist in the real data and removing edges that do exist in the real data until the desired error rates are reached. 
 
-The next problem is systematic error, also known as experimental bias. This phenomenon in particular leads to the violation of stochastic independence between datasets. We simulate this by sampling separate false negative probabilities for each interaction and false positive probabilities for each non-interacting node-pair from Beta distributions. We then use these prepared probilities to generate false positives and false negatives in the experiments, thus introducing the same bias/systematic error. Pseudocode for this method is provided in the supplementary material. \note{TODO: Make sure it is}
+The next problem is systematic error, also known as experimental bias. This phenomenon in particular leads to the violation of stochastic independence between datasets. We simulate this by sampling separate false negative probabilities for each interaction and false positive probabilities for each non-interacting node-pair from Beta distributions. We then use these prepared probilities to generate false positives and false negatives in the experiments, thus introducing the same bias/systematic error. Pseudocode is provided in the supplementary methods. \note{TODO: Make sure it is}
 
 %Finally, another type of problem that easily escapes one's attention is the lack of negative records. Most experiments do not report which pairs of nodes do not possess an edge. As a consequence, it is hard to differentiate between node pairs that have been observed not to interact and node pairs that have not been subject to testing. 
 
