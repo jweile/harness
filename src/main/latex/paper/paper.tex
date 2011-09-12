@@ -69,7 +69,7 @@ These methods assess the quality of each input dataset against one or more addit
 
 The method described by Lee and colleagues evaluates each evidential dataset against such a gold standard and obtain a log likelihood score (LLS). Subsequently, for each interaction in question, a weighted sum is formed over the LLS scores of those datasets that report the interaction. The weights are chosen in a manner that represents the degree of dependency between the datasets \citep{lee_probabilistic_2004}.
 
-James and colleagues describe a method that extends the original method of Lee and colleagues \note{Cite Sam here as soon as the paper is out}. Not only one, but several different gold standards are used to generate LLS scores for the datasets. Furthermore, instead of creating a score for each interaction via the weighted sum described above, this method computes an existence probability from the original LLS scores and then averages over the different probabilites according to the different gold standards. The authors show that any bias inherent in the used gold standards can thus be overcome. \note{REF Lycett paper again here}
+James and colleagues describe a method that extends the original method of Lee and colleagues. Not only one, but several different gold standards are used to generate LLS scores for the datasets. Furthermore, instead of creating a score for each interaction via the weighted sum described above, this method computes an existence probability from the original LLS scores and then averages over the different probabilites according to the different gold standards. The authors show that any bias inherent in the used gold standards can thus be overcome. \note{REF Lycett paper again here}
 
 These methods work very well for functional networks. However, inferring confidence assessments for semantic networks, rather than functional networks, is more challenging, because each single type of association must be scored separately. Reliable gold standards only exist for some of these types. The methods discussed above are thus only of limited use for assessing semantic networks. While solutions for specific types of data do exist, for example, protein-protein interactions \citep{troyanskaya_bayesian_2003,bader_gaining_2004,braun_experimentally_2009,venkatesan_empirical_2009}, These are again dependent on additional data. It would desirable to find a method that can infer confidence measures on biological networks in the absence of a gold standard, that is, based only on the existing experimental data. 
 
@@ -145,7 +145,7 @@ We define the prior distribution of $\pi(G)$ based on the prior probability of e
 \end{align},
 where $q$ is the prior probability of an edge to really exist. \note{Not sure we really need this, since we don't use it afterwards anywhere.}
 
-To determine the prior distribution $\pi(\theta)$, we have to consider the nature of the error rates $\alpha_i$ and $\beta_i$ as ``success rates'' for misreading each potential edge. Modelling each observation event over a potential edge as a Bernoulli experiment with such a success rate, the number of false positives and false negatives in an experimental graph $X_i$ would follow a binomial distribution. The success rates for a binomial distribution can be sampled using the Beta distribution. The Beta distribution is dependent on two parameters, $a$ and $b$. For the prior distribution we assume $a = b = 1$.
+To determine the prior distribution $\pi(\theta)$, we have to consider the nature of the error rates $\alpha_i$ and $\beta_i$ as ``success rates'' for misreading each potential edge. Modelling each observation event over a potential edge as a Bernoulli experiment with such a success rate, the number of false positives and false negatives in an experimental graph $X_i$ would follow a binomial distribution. The success rates for a binomial distribution can be sampled using the Beta distribution. The Beta distribution is dependent on two parameters, $a$ and $b$. For the sake of simplicity, we here assume $a = b = 1$ for the prior distribution.
 
 
 \begin{align}
@@ -166,7 +166,7 @@ The parameters $a$ and $b$ can be interpreted as one plus the number of successe
   \beta_i &\sim Be(\text{fn}_i+1, \text{tp}_i+1)
 \end{align}.
 
-To initiate the algorithm as a whole, we need to generate initial error rate vector $\theta_{\text{init}}$. It is sufficient to sample the initial values for each $\alpha_i$ and $\beta_i$ from their prior distribution.
+To initiate the algorithm as a whole, we need to generate an initial error rate vector $\theta_{\text{init}}$. It is sufficient to sample the initial values for each $\alpha_i$ and $\beta_i$ from their prior distribution.
 %$Be(1,1)$, which is equivalent to the uniform distribution $\mathcal{U}_{[0,1]}$. 
 Pseudocode for the complete algorithm is given in the supplementary material.
 
@@ -176,16 +176,20 @@ Pseudocode for the complete algorithm is given in the supplementary material.
 \subsection{Evaluation method}
 
 In order to evaluate the method described above and to compare it against other probabilistic integration methods, a simulation and testing environment was created. The testing tool creates a random graph according to a specified model. In the simulation, this graph assumes the role of a true biological graph. The tool then derives a set of graphs from the true graph with pre-determined error rates. In the simulation these graphs assume the role of experimental datasets. 
+The simulated experimental datasets are subsequently passed to the integration method under investigation. The integrated graph resulting from the integration method is then compared with the original simulated true graph to evaluate the integration method's performance. 
 
-The simulated experimental datasets are subsequently passed to the integration method under investigation. The integrated graph resulting from the integration method is then compared with the original simulated true graph to evaluate the integration method's performance. Such a testing workflow can be programmed to be executed a large number of times in order to measure a method's average behaviour. Furthermore, the testing tool allows for the automatic variation of different input parameters.
+Such a testing workflow can be programmed to be executed a large number of times in order to measure a method's average behaviour. Furthermore, the testing tool allows for the automatic variation of different input parameters.
 
 The simulated true graph is created as a scale-free graph using a preferential attachment algorithm, since most molecular-biological graphs have been shown to be approximately scale-free \citep{jeong_lethality_2001, eisenberg_preferential_2003}. A description of the algorithm can be found in the supplementary material.
 Not only does the choice of scale free background graphs more closely match the topology of real biological graphs; it also poses an additional challenge for the new algorithm, since such graphs break with the assumption of a uniform prior distribution for $G$.
 
-The next step consists of the simulation of experimental measurements on the true graph. This is the most crucial step of the artificial testing environment as it is responsible for replicating all the different faults and problems of real data. The simplest type of error occurring in experimental measurements is random noise. This type of error is easily simulated by randomly inserting edges that do not exist in the real data and removing edges that do exist in the real data until the desired error rates are reached. The next problem is systematic error, also known as experimental bias. This phenomenon in particular leads to the violation of stochastic independence between datasets. We simulate this by sampling separate false negative probabilities for each interaction and false positive probabilities for each non-interacting node-pair from Beta distributions. We then use these prepared probilities to generate false positives and false negatives in the experiments, thus introducing the same bias/systematic error. Pseudocode for this method is provided in the supplementary material.
-Finally, another type of problem that easily escapes one's attention is the lack of negative records. Most experiments do not report which pairs of nodes do not possess an edge. As a consequence, it is hard to differentiate between node pairs that have been observed not to interact and node pairs that have not been subject to testing. 
+The next step consists of the simulation of experimental measurements on the true graph. This is the most crucial step of the artificial testing environment as it is responsible for replicating all the different faults and problems of real data. The simplest type of error occurring in experimental measurements is random noise. This type of error is easily simulated by randomly inserting edges that do not exist in the real data and removing edges that do exist in the real data until the desired error rates are reached. 
 
-After the simulated evidential graphs have been given to the integration method in question the resulting integrated network is evaluated against the original graph. There are a number of different quality measures that can be applied. One important aspect is to measure the accuracy of the method in estimating the error rates in the individual experiments. We can define the quadratic loss for the error estimates as follows:
+The next problem is systematic error, also known as experimental bias. This phenomenon in particular leads to the violation of stochastic independence between datasets. We simulate this by sampling separate false negative probabilities for each interaction and false positive probabilities for each non-interacting node-pair from Beta distributions. We then use these prepared probilities to generate false positives and false negatives in the experiments, thus introducing the same bias/systematic error. Pseudocode for this method is provided in the supplementary material. \note{TODO: Make sure it is}
+
+%Finally, another type of problem that easily escapes one's attention is the lack of negative records. Most experiments do not report which pairs of nodes do not possess an edge. As a consequence, it is hard to differentiate between node pairs that have been observed not to interact and node pairs that have not been subject to testing. 
+
+After the simulated evidential graphs have been given to the integration method in question the resulting integrated network is evaluated against the original graph. There are a number of different quality measures that can be applied. One important aspect is to measure the accuracy of error rates estimates in the individual experiments. We can define the quadratic loss for the error estimates as follows:
 \begin{equation}
   L_\text{ER} = \frac{1}{2n}\sum_{i=1}^n (\alpha_i - \hat{\alpha_i})^2 + (\beta_i - \hat{\beta_i})^2
 \end{equation},
@@ -198,11 +202,11 @@ Also, to measure the accuracy of the final edge probabilities produced by the me
 	L^{(-)} &= \frac{1}{|\binom{V}{2} \setminus E_G|}\sum_{e \in \binom{V}{2} \setminus E_G} \prob(e \in E_G|X)^2
 \end{align}.
 
-We have evaluated the new algorithm in comparison with two gold standard-based methods presented by Lee and colleagues \citep{lee_probabilistic_2004} and James and colleagues \REF. For our evaluation we have examined the following scenario: Each integration method is given the task of processing a number (3,5,7,9,11) of high-throughput (HTP) experiments with average false negative rate $0.15$ and average false discovery rate of $0.15$ (corresponds to false positive rate of 0.0006). In the case of the gold standard-based methods, one of the input experiments serves as the gold standard.
+We have evaluated the new algorithm in comparison with two gold standard-based methods presented by Lee and colleagues \citep{lee_probabilistic_2004} and James and colleagues \REF. For our evaluation we have examined the following scenario: Each integration method is given the task of processing a number (3,5,7,9, and 11) of experimental scale-free networks with 500 nodes, an average false negative rate $0.15$ and average false discovery rate of $0.15$ (corresponds to false positive rate of 0.0006). The two gold standard-based methods have been given a bias-free input experiment as the gold standard and their additional input parameters (such as the dependency factor) have been set to optimal values to ensure peak performance. We have run 5000 replicates of the above test and averaged over the results.
 
 \subsection{Application to biological networks}
 
-In addition to the evaluation on artificial data we applied the new method to semantically integrated biological data. We used the data integration system Ondex \citep{koehler_graph-based_2006} to gather as much data as possible on the \species{Saccharomyces cerevisiae} protein-protein interaction (PPI) and genetic interaction (GI) network. W have imported all\species{S. cerevisiae} data from the BioGRID \citep{breitkreutz_biogrid_2008}, MINT \citep{chatr-aryamontri_mint:_2007}, IntAct \citep{hermjakob_intact:_2004} and MIPS-MPACT \citep{guldener_mpact:_2006} via the PSI-MI 2.5 XML \citep{kerrien_broadening_2007} format. The resulting Ondex dataset represented proteins and genetic features, as well as their interactions, the experiments in which the interactions have been observed and the publications in which the experiments were described. To identify and interlink equivalent entries we implemented a semantic merger method. Finally, we summarized small low-throughput experiments (<20 interactions) into larger groups according to their experimental type, since low sample sizes can be expected to lead to very unprecise error rate estimates. Further details on the semantic integration procedure can be found in the supplementary material.
+In addition to the evaluation on artificial data we applied the new method to semantically integrated biological data. We used the data integration system Ondex \citep{koehler_graph-based_2006} to gather as much data as possible on the \species{Saccharomyces cerevisiae} protein-protein interaction (PPI) and genetic interaction (GI) network. We imported all\species{S. cerevisiae} data from the BioGRID \citep{breitkreutz_biogrid_2008}, MINT \citep{chatr-aryamontri_mint:_2007}, IntAct \citep{hermjakob_intact:_2004} and MIPS-MPACT \citep{guldener_mpact:_2006} via the PSI-MI 2.5 XML \citep{kerrien_broadening_2007} format. The resulting Ondex dataset represented proteins and genetic features, as well as their interactions, the experiments in which the interactions have been observed and the publications in which the experiments were described. To identify and interlink equivalent entries we implemented a semantic merger method. Finally, we summarized small low-throughput experiments (<20 interactions) into larger groups according to their experimental type, since low sample sizes can be expected to lead to very unprecise error rate estimates. Further details on the semantic integration procedure can be found in the supplementary material. \note{TODO: Make sure it is.}
 
 Having established a semantic knowledge network of physical and genetic interactions within \species{S. cerevisiae} We executed the new algorithm over all 51,006 contained physical interactions (PSI-MI ontology ID MI:0915) and all 15,006 contained synthetic genetic interactions (PSI-MI ontology ID MI:0794), as an exemplary type of genetic interaction.
 
@@ -212,11 +216,11 @@ Having established a semantic knowledge network of physical and genetic interact
 
 \subsection{Evaluation on simulated data}
 
-Figure \ref{htp} shows the methods' performances over different numbers of input HTP experiments. It is clearly visible that the new fully Bayesian method overall outperforms both gold standard-based methods. For low numbers of input datasets, the loss over existing interactions is significantly lower. Given more than five HTP experiments, all methods show comparably low loss of existing interactions. 
+Figure \ref{htp} shows the three methods' performances over different numbers of input experiments. It is clearly visible that the new fully Bayesian method overall outperforms both gold standard-based methods. For low numbers of input datasets, the loss over existing interactions is significantly lower. Given more than five experiments, all methods show comparably low loss of existing interactions. 
 
 Regarding non-existing interactions the fully Bayesian method constantly performs better than the method presented by James and colleagues. \note{See if we can get rid of Lee's strange behaviour here, by using a different threshold.}
 
-The average loss regarding the $\theta$ estimates shows the fully Bayesian method's superior precision, which increases with the number of input experiments, while both gold standard-based methods stagnate at constant large amout of loss.
+The average loss regarding the $\theta$ estimates shows the fully Bayesian method's superior precision, which increases with the number of input experiments, while both gold standard-based methods stagnate at constant large amounts of loss.
 
 \begin{figure}[!tpb]
 \centerline{\includegraphics[width=.5\textwidth]{fig1.pdf}}
@@ -244,22 +248,23 @@ When looking at the probability distribution over synthetic genetic interactions
 
 
 \section{Discussion}
-\note{
-\begin{itemize}
-  \item Excellent performance despite giving competitors head start with unbiased gold standards and accurate fudge factors, which wouldn't be available normally.
-  \item Other possible performance metrics (e.g. ROC curves or weighted sums)
-  \item Future work: Evaluate on simulated low-throughput
-  \item Future work: Further evaluation of the algorithm using the integrated dataset
-  \begin{itemize}
-    \item Measure functional annotation accuracy with leave-one-out
-  \end{itemize}
-  \item Future work: include confidence values given by original experiments. (Discuss problem of missing standards)
-\end{itemize}
-}
+\subsection{Summary and conclusion}
 
-%In addition to the performance metrics used here, others such as the area under ROC curves or weighted sums over the quadratic loss functions above are also possible to apply. However we find that the separate loss functions shown above give a more detailed picture of a method's behaviour.
-%\note{Discuss other possible scoring functions, e.g. weighted sums over FPs and FNs}
+We have presented a novel, fully Bayesian method for assessing the credibility of semantically integrated experimental network data in the absence of gold standards. We have evaluated the method's performance in comparison to two existing gold standard-based methods using realistically simulated data. The new method has shown excellent performance despite the testing environment being designed to specifically challenge it: both competing reference methods have been given optimal input parameters as well as unbiased gold standards, which would not normally be available. Additionally the environment has been set up to simulate scale-free graphs, which emulate the topology of real biological graphs and thus do not meet the algoriths assumptions regarding the prior distribution of $G$. Finally, the experiment simulation has been designed to introduce bias and thus violate the algorithms independence assumption.
 
+We have evaluated the performance of the new algorithm as well as the two reference methods using three different metrics, which express the accuracy of error rate estimation as well as the accuracy of probability assignment to existing and non-existing edges. Other perfomance metrics could have been used as well (e.g. ROC-AUC or weighted sums of loss functions), but would have provided less detail.
+
+While we have shown that the new algorithm performs well on large input experiments, it remains yet to be shown how the method performs on smaller datasets originating from low-throughput experiments. A further limitation to the approach is that it does not take into account any potential pre-existing confidence assessments from the original experiments.
+
+We conclude that the new fully Bayesian method is a valuable addition to the set of tools available for confidence assessment of semantically integrated datasets.
+
+\subsection{Outlook}
+
+Future work will include a further evalation of the method on real biological data. It would be possible to compare the algorithm's performance to other methods when using the calculated confidence values for protein function prediction in a leave-one-out evaluation.
+
+Furthermore we would like to analyze the method's performance on small low-throughput type input data sets. Finally, it would be interesting to explore more of the huge simulation parameter space: A great number of combinations between different numbers of small and large input experiments with varying false positive and false negative rates remains to be surveyed.
+
+Another useful feature would be the incorporation of potential pre-existing confidence values. This is largely complicated by the lack of a common standard. For example, protein-protein interaction data as available in PSI-MI format from the databases mentioned above contains various different confidence values in different metrics, such as probabilities, letter grades or bit-scores.
 
 \section*{Acknowledgements}
 
