@@ -209,7 +209,8 @@ Also, to measure the accuracy of the final edge probabilities produced by the me
 	L^{(-)} &= \frac{1}{|\binom{V}{2} \setminus E_G|}\sum_{e \in \binom{V}{2} \setminus E_G} \prob(e \in E_G|X)^2
 \end{align}.
 
-We have evaluated the new algorithm in comparison with two gold standard-based methods presented by Lee and colleagues \citep{lee_probabilistic_2004} and James and colleagues \REF. For our evaluation we have examined the following scenario: Each integration method is given the task of processing a number (3,5,7,9, and 11) of experimental scale-free networks with 500 nodes, an average false negative rate $0.15$ and average false discovery rate of $0.15$ (corresponds to false positive rate of 0.0006). The two gold standard-based methods have been given a bias-free input experiment as the gold standard and their additional input parameters (such as the dependency factor) have been set to optimal values to ensure peak performance. We have run 5000 replicates of the above test and averaged over the results.
+We have evaluated the new algorithm in comparison with two gold standard-based methods presented by Lee and colleagues \citep{lee_probabilistic_2004} and James and colleagues \REF. For our evaluation we have examined the following scenario: Each integration method is given the task of processing a number (3,5,7,9, and 11) of experimental scale-free networks with 500 nodes, an average false negative rate $0.15$ and average false discovery rate of $0.15$ (corresponds to false positive rate of 0.0006). The two gold standard-based methods have each been given one of these input experiment with the same rates, but freed from bias, as the gold standard. The additional input parameters for the gold standard-based methods (such as the dependency factor) have been set to optimal values to ensure peak performance. We have run 5000 replicates of the above test and averaged over the results.
+As a basic benchmark, we have also executed the same workflow for a naive integration method. The naive method simply assigns the share of experiments that support a given edge as its existence probability.
 
 \subsection{Application to biological networks}
 
@@ -223,7 +224,7 @@ Having established a semantic knowledge network of physical and genetic interact
 
 \subsection{Evaluation on simulated data}
 
-Figure \ref{htp} shows the three methods' performances over different numbers of input experiments. It is clearly visible that the new fully Bayesian method overall outperforms both gold standard-based methods. For low numbers of input datasets, the loss over existing interactions is significantly lower. Given more than five experiments, all methods show comparably low loss of existing interactions. 
+Figure \ref{htp} shows the three methods' performances over different numbers of input experiments. It is clearly visible that the new fully Bayesian method overall outperforms both gold standard-based methods. For low numbers of input datasets, the fully Bayesian method's loss over existing interactions is significantly lower and is the only method to perform better than the naive approach for three input experiments. Given more than five experiments, all methods show comparably low loss of existing interactions. 
 
 Regarding non-existing interactions the fully Bayesian method constantly performs better than the method presented by James and colleagues. \note{See if we can get rid of Lee's strange behaviour here, by using a different threshold.}
 
@@ -231,7 +232,7 @@ The average loss regarding the $\theta$ estimates shows the fully Bayesian metho
 
 \begin{figure}[!tpb]
 \centerline{\includegraphics[width=.5\textwidth]{fig1.pdf}}
-\caption{Evaluation of the algorithm in comparison with GS-based methods by Lee and colleagues and James and colleagues given different numbers of HTP experiments. Top: Average loss over interacting node pairs ($L^{(+)}$). Centre: Average loss over non-interacting node pairs ($L^{(-)}$). Bottom: Average loss over regarding error rate estimates ($L_\text{ER}$).}
+\caption{Evaluation of the algorithm in comparison with the naive method as well as the GS-based methods by Lee and colleagues and James and colleagues given different numbers of experiments. Top: Average loss over interacting node pairs ($L^{(+)}$). Centre: Average loss over non-interacting node pairs ($L^{(-)}$). Bottom: Average loss regarding error rate estimates ($L_\text{ER}$).}
 \label{htp}
 \end{figure}
 
