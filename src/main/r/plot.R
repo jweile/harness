@@ -5,7 +5,7 @@ op=par(mfrow=c(3,1))
 
 fn <- read.table("fn.tsv",header=TRUE,row.names=1,sep="\t")
 barplot(as.matrix(t(fn)),beside=TRUE,xlab="# experiments",ylab=expression(E(L^{"("+")"})) )
-legend("topright",c(expression(paste("Lee ",italic("et al."))),expression(paste("James ",italic("et al."))),expression(paste("Weile ",italic("et al.")))),bty="n",fill=grey.colors(3))
+legend("topright",c("Naive", expression(paste("Lee ",italic("et al."))),expression(paste("James ",italic("et al."))),expression(paste("Weile ",italic("et al.")))),bty="n",fill=grey.colors(4))
 
 fp <- read.table("fp.tsv",header=TRUE,row.names=1,sep="\t")
 barplot(as.matrix(t(fp)),beside=TRUE,xlab="# experiments",ylab=expression(E(L^{"("-")"})) )
